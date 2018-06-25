@@ -17,5 +17,14 @@ zynq
 #### The based BSP
 
 source MicroZED.bsp/source.env  
-zynq all
+zynq create BSP_FILE
+cd MicroZED.bsp
+zynq build
+zynq image
 
+#### The based HDF
+
+source MicroZED.hdf/source.env
+zynq create HDF_DIR_PATH
+zynq build
+zynq image
