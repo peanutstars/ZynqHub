@@ -4128,8 +4128,6 @@ CONFIG_bridge-utils=y
 #
 # user packages 
 #
-# CONFIG_iperf is not set
-CONFIG_iperf3=y
 
 #
 # PetaLinux RootFS Settings

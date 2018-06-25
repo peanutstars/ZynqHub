@@ -17,14 +17,20 @@ zynq
 #### The based BSP
 
 source MicroZED.bsp/source.env  
-zynq create BSP_FILE
-cd MicroZED.bsp
-zynq build
+zynq create BSP_FILE  
+cd MicroZED.bsp  
+zynq build  
+zynq build  
 zynq image
 
 #### The based HDF
 
-source MicroZED.hdf/source.env
-zynq create HDF_DIR_PATH
-zynq build
+source MicroZED.hdf/source.env  
+zynq create HDF_DIR_PATH  
+zynq build  
+zynq build  
 zynq image
+
+#### Booting with SD-Card
+
+zynq copy DEST_PART_1
