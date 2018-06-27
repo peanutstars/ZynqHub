@@ -34,3 +34,11 @@ zynq image
 #### Booting with SD-Card
 
 zynq copy DEST_PART_1
+
+
+## Booting Time
+
+Displayed a message to request DHCP after pressed a reset button.
+
+QSPI Flash + /dev/mmcblk0p2: About 8 seconds  
+SD-Card + /dev/mmcblk0p2: About 11.5 seconds  
