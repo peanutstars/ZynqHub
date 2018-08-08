@@ -9,4 +9,6 @@ pre-built/linux/
 *.jou
 *.log
 project-spec/meta-plnx-generated/
-/components/plnx_workspace
+components/plnx_workspace
+components/linux-xlnx
+components/u-boot-xlnx
