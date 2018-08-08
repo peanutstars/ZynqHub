@@ -2,9 +2,9 @@
 
 
 ## Prepare
-+ Install petalinux-v2017.4-final-installer.run to /opt/pkg which linked as petalinux-v2017.4-final.  
-  + /opt/pkg -> petalinux-v2017.4-final
-+ BSP file could be refer from http://zedboard.org/support/design/1519/10 for MicroZED Board.  
++ Install petalinux-v2018.2-final-installer.run to /opt/pkg which it linked as petalinux-v2018.2-final.  
+  + /opt/pkg -> petalinux-v2018.2-final
++ BSP file could be getting from http://zedboard.org/support/design/1519/10 for MicroZED Board.  
   + /opt/pkg/mz7010_fmccc_2017_4.bsp
 
 
@@ -12,20 +12,27 @@
 
 ### help
 
+source MicroZED.182/source.env  
 zynq
 
 #### Create with the based HDF
 
 source MicroZED.182/source.env  
-zynq create `pwd`/hdf.182  
+zynq create \`pwd\`/hdf.182  
+cd MicroZED.182
 zynq build  
 zynq build  
 zynq image
 
 #### Booting with SD-Card
 
-zynq copy DEST_PARTITION_1
+## Copy BOOT.BIN and image.ub to partition 1 of SD-Card  
 
+zynq copy [FOLDER_OF_SD_PARTITION_1]
+
+## Make RootFS to Partition 2 of SD-Card
+
+ 
 
 ## Booting Time
 
