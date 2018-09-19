@@ -1,3 +1,11 @@
 /include/ "system-conf.dtsi"
 / {
+    i2c1 {
+        status = "okay";
+        rtc@51 {
+            /* nxp pcf8563 rtc */
+            compatible = "nxp,pcf8563";
+            reg = <0x51>;
+        };
+    };
 };
