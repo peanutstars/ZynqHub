@@ -4132,6 +4132,7 @@ CONFIG_bridge-utils=y
 #
 # CONFIG_gpio-demo is not set
 # CONFIG_peekpoke is not set
+CONFIG_py.gpio=y
 
 #
 # user packages 
