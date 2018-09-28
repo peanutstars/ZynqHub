@@ -153,22 +153,22 @@ Xilinx
 <B>MIO 0</B>
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+GPIO
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+gpio[0]
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+LVCMOS 3.3V
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+slow
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+enabled
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+inout
 </TD>
 </TR>
 <TR valign="top">
@@ -314,22 +314,22 @@ out
 <B>MIO 7</B>
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+GPIO
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+gpio[7]
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+LVCMOS 3.3V
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+slow
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+disabled
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+out
 </TD>
 </TR>
 <TR valign="top">
@@ -337,22 +337,22 @@ out
 <B>MIO 8</B>
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+USB Reset
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+reset
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+LVCMOS 3.3V
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+slow
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+disabled
 </TD>
 <TD width=10% BGCOLOR=#FBF5EF>
-
+out
 </TD>
 </TR>
 <TR valign="top">
@@ -23508,6 +23508,28 @@ DDRIOB_DCI_CTRL
 </TR>
 <TR valign="top">
 <TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MIO_PIN_00">
+MIO_PIN_00
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000700</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>MIO Pin 0 Control</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
 <A href="#MIO_PIN_01">
 MIO_PIN_01
 </A>
@@ -23636,6 +23658,50 @@ MIO_PIN_06
 </TD>
 <TD width=35% BGCOLOR=#FBF5EF>
 <B>MIO Pin 6 Control</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MIO_PIN_07">
+MIO_PIN_07
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF800071C</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>MIO Pin 7 Control</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MIO_PIN_08">
+MIO_PIN_08
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000720</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>MIO Pin 8 Control</B>
 </TD>
 </TR>
 <TR valign="top">
@@ -28454,6 +28520,273 @@ SLCR_LOCK
 </TABLE>
 <P>
 <H1>MIO PROGRAMMING</H1>
+<H2><a name="MIO_PIN_00">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_00</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MIO_PIN_00</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000700</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>TRI_ENABLE</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Tri-state enable, active high. 0: disable 1: enable</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L0_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1:1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 0 Mux Select 0: Level 1 Mux 1: Quad SPI 1 chip select, Output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L1_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>2:2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>4</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 1 Mux Select 0: Level 2 Mux 1: reserved</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L2_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>4:3</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>18</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 2 Mux Select 00: Level 3 Mux 01: SRAM/NOR Chip Select 0, Output 10: NAND Flash Chip Select, Output 11: SDIO 0 Power Control, Output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L3_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>7:5</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 3 Mux Select 000: GPIO 0 (bank 0), Input/Output others: reserved</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>Speed</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>8:8</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Select IO Buffer Edge Rate, applicable when IO_Type is LVCMOS18, LVCMOS25 or LVCMOS33. 0: Slow CMOS edge 1: Fast CMOS edge</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>IO_Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>11:9</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e00</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>3</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Select the IO Buffer Type. 000: Reserved 001: LVCMOS18 010: LVCMOS25 011, 101, 110, 111: LVCMOS33 100: HSTL</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>PULLUP</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>12:12</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Enables Pullup on IO Buffer pin 0: disable 1: enable</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DisableRcvr</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>13:13</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Disable HSTL Input Buffer to save power when it is an output-only (IO_Type must be HSTL). 0: enable 1: disable</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MIO_PIN_00@0XF8000700</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>3fff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>1600</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>MIO Pin 0 Control</B>
+</TD>
+</TR>
+</TABLE>
+<P>
 <H2><a name="MIO_PIN_01">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_01</a></H2>
 <TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
 <TR valign="top">
@@ -30052,6 +30385,540 @@ SLCR_LOCK
 </TD>
 <TD width=35% BGCOLOR=#C0C0C0>
 <B>MIO Pin 6 Control</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H2><a name="MIO_PIN_07">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_07</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MIO_PIN_07</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF800071C</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>TRI_ENABLE</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[TRI_ENABLE]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L0_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1:1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 0 Mux Select 0: Level 1 Mux 1: reserved</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L1_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>2:2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>4</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 1 Mux Select 0: Level 2 Mux 1: Trace Port Data Bit 13, Output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L2_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>4:3</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>18</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 2 Mux Select 00: Level 3 Mux 01: SRAM/NOR OE_B, Output 10: NAND Flash CLE_B, Output 11: SDIO 1 Power Control, Output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L3_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>7:5</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 3 Mux Select 000: GPIO 7 (bank 0), Output-only others: reserved</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>Speed</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>8:8</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[Speed]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>IO_Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>11:9</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e00</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>3</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[IO_Type]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>PULLUP</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>12:12</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[PULLUP]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DisableRcvr</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>13:13</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[DisableRcvr]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MIO_PIN_07@0XF800071C</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>3fff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>MIO Pin 7 Control</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H2><a name="MIO_PIN_08">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_08</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MIO_PIN_08</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000720</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>TRI_ENABLE</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[TRI_ENABLE]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L0_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1:1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 0 Mux Select 0: Level 1 Mux 1: Quad SPI Feedback Clock, Output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L1_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>2:2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>4</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 1 Mux Select 0: Level 2 Mux 1: Trace Port Data Bit 14, Output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L2_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>4:3</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>18</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 2 Mux Select 00: Level 3 Mux 01: reserved 10: NAND Flash RD_B, Output 11: SDIO 0 Power Control, Output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L3_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>7:5</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 3 Mux Select 000: GPIO 8 (bank 0), Output-only 001: CAN 1 Tx, Output 010: SRAM/NOR BLS_B, Output 011 to 110: reserved 111: UART 1 TxD, Output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>Speed</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>8:8</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[Speed]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>IO_Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>11:9</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e00</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>3</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[IO_Type]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>PULLUP</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>12:12</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[PULLUP]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DisableRcvr</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>13:13</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[DisableRcvr]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MIO_PIN_08@0XF8000720</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>3fff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>MIO Pin 8 Control</B>
 </TD>
 </TR>
 </TABLE>
@@ -42602,6 +43469,116 @@ CTRL
 <B>Control Register : This register defines basic control registers. Some of the register bits can be locked by control bits in the LOCK Register 0x004.</B>
 </TD>
 </TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#DIRM_0">
+DIRM_0
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A204</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Direction mode (GPIO Bank0, MIO)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MASK_DATA_0_LSW">
+MASK_DATA_0_LSW
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#OEN_0">
+OEN_0
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A208</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Output enable (GPIO Bank0, MIO)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MASK_DATA_0_LSW">
+MASK_DATA_0_LSW
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MASK_DATA_0_LSW">
+MASK_DATA_0_LSW
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
 </TABLE>
 <P>
 <H2><a name="ps7_peripherals_init_data_3_0">ps7_peripherals_init_data_3_0</a></H2>
@@ -44916,6 +45893,619 @@ CTRL
 <H1>DIRECT COMMAND</H1>
 <H1>NOR CS1 BASE ADDRESS</H1>
 <H1>USB RESET</H1>
+<H1>USB0 RESET</H1>
+<H1>DIR MODE BANK 0</H1>
+<H2><a name="DIRM_0">Register (<A href=#mod___slcr> slcr </A>)DIRM_0</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DIRM_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A204</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DIRECTION_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Direction mode 0: input 1: output Each bit configures the corresponding pin within the 32-bit bank NOTE: bits[8:7] of bank0 cannot be used as inputs. The DIRM bits can be set to 0, but reading DATA_RO does not reflect the input value. See the GPIO chapter for more information.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>DIRM_0@0XE000A204</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Direction mode (GPIO Bank0, MIO)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>DIR MODE BANK 1</H1>
+<H1>MASK_DATA_0_LSW HIGH BANK [15:0]</H1>
+<H2><a name="MASK_DATA_0_LSW">Register (<A href=#mod___slcr> slcr </A>)MASK_DATA_0_LSW</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:16</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff0000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>feff</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, only bits with a corresponding deasserted mask will change the output value. 0: pin value is updated 1: pin is masked Each bit controls the corresponding pin within the 16-bit half-bank. Reads return 0's.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>15:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, these are the data values for the corresponding GPIO output bits. Each bit controls the corresponding pin within the 16-bit half-bank. Reads return the previous value written to this register or DATA_0[15:0]. Reads do not return the value on the GPIO pin.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MASK_DATA_0_LSW@0XE000A000</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>feff0100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>MASK_DATA_0_MSW HIGH BANK [31:16]</H1>
+<H1>MASK_DATA_1_LSW HIGH BANK [47:32]</H1>
+<H1>MASK_DATA_1_MSW HIGH BANK [53:48]</H1>
+<H1>OUTPUT ENABLE BANK 0</H1>
+<H2><a name="OEN_0">Register (<A href=#mod___slcr> slcr </A>)OEN_0</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>OEN_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A208</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>OP_ENABLE_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Output enables 0: disabled 1: enabled Each bit configures the corresponding pin within the 32-bit bank</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>OEN_0@0XE000A208</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Output enable (GPIO Bank0, MIO)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>OUTPUT ENABLE BANK 1</H1>
+<H1>MASK_DATA_0_LSW LOW BANK [15:0]</H1>
+<H2><a name="MASK_DATA_0_LSW">Register (<A href=#mod___slcr> slcr </A>)MASK_DATA_0_LSW</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:16</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff0000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>feff</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, only bits with a corresponding deasserted mask will change the output value. 0: pin value is updated 1: pin is masked Each bit controls the corresponding pin within the 16-bit half-bank. Reads return 0's.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>15:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, these are the data values for the corresponding GPIO output bits. Each bit controls the corresponding pin within the 16-bit half-bank. Reads return the previous value written to this register or DATA_0[15:0]. Reads do not return the value on the GPIO pin.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MASK_DATA_0_LSW@0XE000A000</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>MASK_DATA_0_MSW LOW BANK [31:16]</H1>
+<H1>MASK_DATA_1_LSW LOW BANK [47:32]</H1>
+<H1>MASK_DATA_1_MSW LOW BANK [53:48]</H1>
+<H1>ADD 1 MS DELAY</H1>
+<H1>MASK_DATA_0_LSW HIGH BANK [15:0]</H1>
+<H2><a name="MASK_DATA_0_LSW">Register (<A href=#mod___slcr> slcr </A>)MASK_DATA_0_LSW</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:16</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff0000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>feff</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, only bits with a corresponding deasserted mask will change the output value. 0: pin value is updated 1: pin is masked Each bit controls the corresponding pin within the 16-bit half-bank. Reads return 0's.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>15:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, these are the data values for the corresponding GPIO output bits. Each bit controls the corresponding pin within the 16-bit half-bank. Reads return the previous value written to this register or DATA_0[15:0]. Reads do not return the value on the GPIO pin.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MASK_DATA_0_LSW@0XE000A000</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>feff0100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>MASK_DATA_0_MSW HIGH BANK [31:16]</H1>
+<H1>MASK_DATA_1_LSW HIGH BANK [47:32]</H1>
+<H1>MASK_DATA_1_MSW HIGH BANK [53:48]</H1>
 <H1>ENET RESET</H1>
 <H1>I2C RESET</H1>
 <H1>NOR CHIP SELECT</H1>
@@ -69125,6 +70715,28 @@ DDRIOB_DCI_CTRL
 </TR>
 <TR valign="top">
 <TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MIO_PIN_00">
+MIO_PIN_00
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000700</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>MIO Pin 0 Control</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
 <A href="#MIO_PIN_01">
 MIO_PIN_01
 </A>
@@ -69253,6 +70865,50 @@ MIO_PIN_06
 </TD>
 <TD width=35% BGCOLOR=#FBF5EF>
 <B>MIO Pin 6 Control</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MIO_PIN_07">
+MIO_PIN_07
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF800071C</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>MIO Pin 7 Control</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MIO_PIN_08">
+MIO_PIN_08
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000720</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>MIO Pin 8 Control</B>
 </TD>
 </TR>
 <TR valign="top">
@@ -74091,6 +75747,273 @@ SLCR_LOCK
 </TABLE>
 <P>
 <H1>MIO PROGRAMMING</H1>
+<H2><a name="MIO_PIN_00">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_00</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MIO_PIN_00</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000700</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>TRI_ENABLE</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Tri-state enable, active high. 0: disable 1: enable</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L0_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1:1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 0 Mux Select 0: Level 1 Mux 1: Quad SPI 1 chip select</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L1_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>2:2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>4</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 1 Mux Select 0: Level 2 Mux 1: reserved</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L2_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>4:3</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>18</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 2 Mux Select 00: Level 3 Mux 01: SRAM/NOR Chip Select 0 10: NAND Flash Chip Select 11: SDIO 0 Power Control output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L3_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>7:5</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 3 Mux Select 000: GPIO 0 (bank 0) others: reserved</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>Speed</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>8:8</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Select IO Buffer Edge Rate, applicable when IO_Type= LVCMOS18, LVCMOS25 or LVCMOS33. 0: Slow CMOS edge 1: Fast CMOS edge</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>IO_Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>11:9</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e00</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>3</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Select the IO Buffer Type. 000: LVTTL 001: LVCMOS18 010: LVCMOS25 011, 101, 110, 111: LVCMOS33 100: HSTL</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>PULLUP</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>12:12</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Enables pull-up on IO Buffer pin 0: disable 1: enable</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DisableRcvr</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>13:13</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Disable HSTL Input Buffer to save power when it is an output-only (IO_Type must be HSTL). 0: enable 1: disable</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MIO_PIN_00@0XF8000700</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>3fff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>1600</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>MIO Pin 0 Control</B>
+</TD>
+</TR>
+</TABLE>
+<P>
 <H2><a name="MIO_PIN_01">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_01</a></H2>
 <TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
 <TR valign="top">
@@ -75689,6 +77612,540 @@ SLCR_LOCK
 </TD>
 <TD width=35% BGCOLOR=#C0C0C0>
 <B>MIO Pin 6 Control</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H2><a name="MIO_PIN_07">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_07</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MIO_PIN_07</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF800071C</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>TRI_ENABLE</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[TRI_ENABLE]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L0_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1:1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 0 Mux Select 0: Level 1 Mux 1: reserved</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L1_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>2:2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>4</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 1 Mux Select 0: Level 2 Mux 1: Trace Port Data Bit 13</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L2_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>4:3</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>18</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 2 Mux Select 00: Level 3 Mux 01: SRAM/NOR OE_B 10: NAND Flash CLE_B 11: SDIO 1 Power Control output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L3_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>7:5</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 3 Mux Select 000: GPIO 7 Output-only (bank 0) others: reserved</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>Speed</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>8:8</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[Speed]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>IO_Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>11:9</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e00</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>3</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[IO_Type]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>PULLUP</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>12:12</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[PULL_UP]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DisableRcvr</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>13:13</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[DisableRcvr]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MIO_PIN_07@0XF800071C</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>3fff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>MIO Pin 7 Control</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H2><a name="MIO_PIN_08">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_08</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MIO_PIN_08</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000720</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>TRI_ENABLE</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[TRI_ENABLE]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L0_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1:1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 0 Mux Select 0: Level 1 Mux 1: Quad SPI Feedback Output Clock</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L1_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>2:2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>4</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 1 Mux Select 0: Level 2 Mux 1: Trace Port Data Bit 14</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L2_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>4:3</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>18</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 2 Mux Select 00: Level 3 Mux 01: SRAM/NOR WE_B 10: NAND Flash RD_B 11: SDIO 0 Power Control output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L3_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>7:5</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 3 Mux Select 000: GPIO 8 Output-only (bank 0) 001: CAN 1 Tx 010: sram, Output, smc_sram_bls_b 011 to 110: reserved 111: UART 1 TxD</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>Speed</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>8:8</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[Speed]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>IO_Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>11:9</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e00</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>3</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[IO_Type]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>PULLUP</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>12:12</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[PULL_UP]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DisableRcvr</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>13:13</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Operates the same as MIO_PIN_00[DisableRcvr]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MIO_PIN_08@0XF8000720</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>3fff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>MIO Pin 8 Control</B>
 </TD>
 </TR>
 </TABLE>
@@ -88239,6 +90696,116 @@ CTRL
 <B>Control Register : This register defines basic control registers. Some of the register bits can be locked by control bits in the LOCK Register 0x004.</B>
 </TD>
 </TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#DIRM_0">
+DIRM_0
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A204</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Direction mode (GPIO Bank0, MIO)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MASK_DATA_0_LSW">
+MASK_DATA_0_LSW
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#OEN_0">
+OEN_0
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A208</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Output enable (GPIO Bank0, MIO)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MASK_DATA_0_LSW">
+MASK_DATA_0_LSW
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MASK_DATA_0_LSW">
+MASK_DATA_0_LSW
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
 </TABLE>
 <P>
 <H2><a name="ps7_peripherals_init_data_2_0">ps7_peripherals_init_data_2_0</a></H2>
@@ -90633,6 +93200,619 @@ CTRL
 <H1>DIRECT COMMAND</H1>
 <H1>NOR CS1 BASE ADDRESS</H1>
 <H1>USB RESET</H1>
+<H1>USB0 RESET</H1>
+<H1>DIR MODE BANK 0</H1>
+<H2><a name="DIRM_0">Register (<A href=#mod___slcr> slcr </A>)DIRM_0</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DIRM_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A204</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DIRECTION_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Direction mode 0: input 1: output Each bit configures the corresponding pin within the 32-bit bank NOTE: bits[8:7] of bank0 cannot be used as inputs. The DIRM bits can be set to 0, but reading DATA_RO does not reflect the input value. See the GPIO chapter for more information.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>DIRM_0@0XE000A204</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Direction mode (GPIO Bank0, MIO)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>DIR MODE BANK 1</H1>
+<H1>MASK_DATA_0_LSW HIGH BANK [15:0]</H1>
+<H2><a name="MASK_DATA_0_LSW">Register (<A href=#mod___slcr> slcr </A>)MASK_DATA_0_LSW</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:16</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff0000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>feff</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, only bits with a corresponding deasserted mask will change the output value. 0: pin value is updated 1: pin is masked Each bit controls the corresponding pin within the 16-bit half-bank. Reads return 0's.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>15:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, these are the data values for the corresponding GPIO output bits. Each bit controls the corresponding pin within the 16-bit half-bank. Reads return the previous value written to this register or DATA_0[15:0]. Reads do not return the value on the GPIO pin.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MASK_DATA_0_LSW@0XE000A000</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>feff0100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>MASK_DATA_0_MSW HIGH BANK [31:16]</H1>
+<H1>MASK_DATA_1_LSW HIGH BANK [47:32]</H1>
+<H1>MASK_DATA_1_MSW HIGH BANK [53:48]</H1>
+<H1>OUTPUT ENABLE BANK 0</H1>
+<H2><a name="OEN_0">Register (<A href=#mod___slcr> slcr </A>)OEN_0</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>OEN_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A208</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>OP_ENABLE_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Output enables 0: disabled 1: enabled Each bit configures the corresponding pin within the 32-bit bank</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>OEN_0@0XE000A208</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Output enable (GPIO Bank0, MIO)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>OUTPUT ENABLE BANK 1</H1>
+<H1>MASK_DATA_0_LSW LOW BANK [15:0]</H1>
+<H2><a name="MASK_DATA_0_LSW">Register (<A href=#mod___slcr> slcr </A>)MASK_DATA_0_LSW</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:16</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff0000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>feff</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, only bits with a corresponding deasserted mask will change the output value. 0: pin value is updated 1: pin is masked Each bit controls the corresponding pin within the 16-bit half-bank. Reads return 0's.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>15:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, these are the data values for the corresponding GPIO output bits. Each bit controls the corresponding pin within the 16-bit half-bank. Reads return the previous value written to this register or DATA_0[15:0]. Reads do not return the value on the GPIO pin.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MASK_DATA_0_LSW@0XE000A000</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>MASK_DATA_0_MSW LOW BANK [31:16]</H1>
+<H1>MASK_DATA_1_LSW LOW BANK [47:32]</H1>
+<H1>MASK_DATA_1_MSW LOW BANK [53:48]</H1>
+<H1>ADD 1 MS DELAY</H1>
+<H1>MASK_DATA_0_LSW HIGH BANK [15:0]</H1>
+<H2><a name="MASK_DATA_0_LSW">Register (<A href=#mod___slcr> slcr </A>)MASK_DATA_0_LSW</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:16</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff0000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>feff</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, only bits with a corresponding deasserted mask will change the output value. 0: pin value is updated 1: pin is masked Each bit controls the corresponding pin within the 16-bit half-bank. Reads return 0's.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>15:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>On a write, these are the data values for the corresponding GPIO output bits. Each bit controls the corresponding pin within the 16-bit half-bank. Reads return the previous value written to this register or DATA_0[15:0]. Reads do not return the value on the GPIO pin.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MASK_DATA_0_LSW@0XE000A000</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>feff0100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Maskable Output Data (GPIO Bank0, MIO, Lower 16bits)</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>MASK_DATA_0_MSW HIGH BANK [31:16]</H1>
+<H1>MASK_DATA_1_LSW HIGH BANK [47:32]</H1>
+<H1>MASK_DATA_1_MSW HIGH BANK [53:48]</H1>
 <H1>ENET RESET</H1>
 <H1>I2C RESET</H1>
 <H1>NOR CHIP SELECT</H1>
@@ -114183,6 +117363,28 @@ DDRIOB_DCI_CTRL
 </TR>
 <TR valign="top">
 <TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MIO_PIN_00">
+MIO_PIN_00
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000700</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>MIO Control for Pin 0</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
 <A href="#MIO_PIN_01">
 MIO_PIN_01
 </A>
@@ -114311,6 +117513,50 @@ MIO_PIN_06
 </TD>
 <TD width=35% BGCOLOR=#FBF5EF>
 <B>MIO Control for Pin 6</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MIO_PIN_07">
+MIO_PIN_07
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF800071C</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>MIO Control for Pin 7</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MIO_PIN_08">
+MIO_PIN_08
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000720</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>MIO Control for Pin 8</B>
 </TD>
 </TR>
 <TR valign="top">
@@ -119129,6 +122375,273 @@ SLCR_LOCK
 </TABLE>
 <P>
 <H1>MIO PROGRAMMING</H1>
+<H2><a name="MIO_PIN_00">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_00</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MIO_PIN_00</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000700</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>TRI_ENABLE</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Tri-state enable, active high.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L0_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1:1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 0 Mux Select 0= Level 1 Mux Output 1= qspi_sel, Output, qspi_n_ss_out_upper- (QSPI Upper select)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L1_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>2:2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>4</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 1 Mux Select 0= Level 2 Mux Output 1= Not Used</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L2_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>4:3</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>18</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 2 Mux Select 0= Level 3 Mux Output 1= smc_cs0, Output, smc_sram_cs_n[0]- (SRAM CS0) 2= nand_cs, Output, smc_nand_cs_n- (NAND chip select) 3= sdio_pow, Output, sdio0_bus_pow- (SD card bus power)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L3_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>7:5</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 3 Mux Select 0= gpio0, Input, gpio_0_pin_in[0]- (GPIO bank 0) 0= gpio0, Output, gpio_0_pin_out[0]- (GPIO bank 0) 1= Not Used 2= Not Used 3= Not Used 4= Not Used 5= Not Used 6= Not Used 7= Not Used</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>Speed</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>8:8</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Selects the speed of the I/O when IO_Type=CMOS 0=Slow CMOS 1=Fast CMOS</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>IO_Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>11:9</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e00</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>3</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Selects the IO Type 0= LVTTL 1= LVCMOS18 2= LVCMOS25 3= LVCMOS33 4= HSTL 5-7= LVCMOS33</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>PULLUP</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>12:12</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Controls the use of a pull-up for the associated GPIOB 0= Pull-up disabled 1= Pull-up enabled</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DisableRcvr</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>13:13</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Enables the receiver. If the IO is an output only then the receiver can be disabled and save power Only used when IO_Type=HSTL 0= Receiver Enabled 1= Receiver disabled</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MIO_PIN_00@0XF8000700</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>3fff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>1600</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>MIO Control for Pin 0</B>
+</TD>
+</TR>
+</TABLE>
+<P>
 <H2><a name="MIO_PIN_01">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_01</a></H2>
 <TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
 <TR valign="top">
@@ -120727,6 +124240,540 @@ SLCR_LOCK
 </TD>
 <TD width=35% BGCOLOR=#C0C0C0>
 <B>MIO Control for Pin 6</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H2><a name="MIO_PIN_07">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_07</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MIO_PIN_07</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF800071C</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>TRI_ENABLE</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Tri-state enable, active high.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L0_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1:1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 0 Mux Select 0= Level 1 Mux Output 1= Not Used</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L1_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>2:2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>4</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 1 Mux Select 0= Level 2 Mux Output 1= trace_data, Output, tracedq[13]- (Trace Port Databus)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L2_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>4:3</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>18</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 2 Mux Select 0= Level 3 Mux Output 1= sram_nor, Output, smc_sram_oe_b- (SRAM Output enable) 2= nand, Output, smc_nand_cle- (NAND Command Latch Enable) 3= sdio_pow, Output, sdio1_bus_pow- (SD card bus power)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L3_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>7:5</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 3 Mux Select 0= gpio0, Output, gpio_0_pin_out[7]- (GPIO bank 0) 1= Not Used 2= Not Used 3= Not Used 4= Not Used 5= Not Used 6= Not Used 7= Not Used</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>Speed</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>8:8</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Selects the speed of the I/O when IO_Type=CMOS 0=Slow CMOS 1=Fast CMOS</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>IO_Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>11:9</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e00</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>3</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Selects the IO Type 0= LVTTL 1= LVCMOS18 2= LVCMOS25 3= LVCMOS33 4= HSTL 5-7= LVCMOS33</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>PULLUP</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>12:12</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Controls the use of a pull-up for the associated GPIOB 0= Pull-up disabled 1= Pull-up enabled Pull-up disabled by default as this pin is used for vcfg[0]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DisableRcvr</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>13:13</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Enables the receiver. If the IO is an output only then the receiver can be disabled and save power Only used when IO_Type=HSTL 0= Receiver Enabled 1= Receiver disabled</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MIO_PIN_07@0XF800071C</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>3fff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>MIO Control for Pin 7</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H2><a name="MIO_PIN_08">Register (<A href=#mod___slcr> slcr </A>)MIO_PIN_08</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MIO_PIN_08</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XF8000720</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>TRI_ENABLE</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Tri-state enable, active high.</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L0_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>1:1</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 0 Mux Select 0= Level 1 Mux Output 1= qspi, Output, qspi_clk_for_lpbk- (QSPI Clock to be fed-back)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L1_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>2:2</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>4</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 1 Mux Select 0= Level 2 Mux Output 1= trace_data, Output, tracedq[14]- (Trace Port Databus)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L2_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>4:3</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>18</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 2 Mux Select 0= Level 3 Mux Output 1= sram_nor, Output, smc_sram_we_b- (SRAM Write enable) 2= nand, Output, smc_nand_re_b- (NAND Read Enable) 3= sdio_pow, Output, sdio0_bus_pow- (SD card bus power)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>L3_SEL</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>7:5</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Level 3 Mux Select 0= gpio0, Output, gpio_0_pin_out[8]- (GPIO bank 0) 1= can1, Output, can1_phy_tx- (Can TX signal) 2= Not Used 3= Not Used 4= Not Used 5= Not Used 6= Not Used 7= ua1, Output, ua1_txd- (UART transmitter serial output)</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>Speed</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>8:8</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Selects the speed of the I/O when IO_Type=CMOS 0=Slow CMOS 1=Fast CMOS</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>IO_Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>11:9</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>e00</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>3</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Selects the IO Type 0= LVTTL 1= LVCMOS18 2= LVCMOS25 3= LVCMOS33 4= HSTL 5-7= LVCMOS33</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>PULLUP</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>12:12</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>1000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Controls the use of a pull-up for the associated GPIOB 0= Pull-up disabled 1= Pull-up enabled Pull-up disabled by default as this pin is used for vcfg[1]</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DisableRcvr</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>13:13</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>2000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Enables the receiver. If the IO is an output only then the receiver can be disabled and save power Only used when IO_Type=HSTL 0= Receiver Enabled 1= Receiver disabled</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MIO_PIN_08@0XF8000720</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>3fff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>600</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>MIO Control for Pin 8</B>
 </TD>
 </TR>
 </TABLE>
@@ -133277,6 +137324,116 @@ CTRL
 <B>Control Register : This register defines basic control registers. Some of the register bits can be locked by control bits in the LOCK Register 0x004.</B>
 </TD>
 </TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#DIRM_0">
+DIRM_0
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A204</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Direction mode configuration register: Configures bank 0 for direction mode, either input or output</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MASK_DATA_0_LSW">
+MASK_DATA_0_LSW
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Maskable single-word-based data access register: Mask and data access for the least significant word of this bank of GPIO pins</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#OEN_0">
+OEN_0
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A208</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Output enable register: Configures the output enables of bank 0</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MASK_DATA_0_LSW">
+MASK_DATA_0_LSW
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Maskable single-word-based data access register: Mask and data access for the least significant word of this bank of GPIO pins</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<A href="#MASK_DATA_0_LSW">
+MASK_DATA_0_LSW
+</A>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>RW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Maskable single-word-based data access register: Mask and data access for the least significant word of this bank of GPIO pins</B>
+</TD>
+</TR>
 </TABLE>
 <P>
 <H2><a name="ps7_peripherals_init_data_1_0">ps7_peripherals_init_data_1_0</a></H2>
@@ -135671,6 +139828,619 @@ CTRL
 <H1>DIRECT COMMAND</H1>
 <H1>NOR CS1 BASE ADDRESS</H1>
 <H1>USB RESET</H1>
+<H1>USB0 RESET</H1>
+<H1>DIR MODE BANK 0</H1>
+<H2><a name="DIRM_0">Register (<A href=#mod___slcr> slcr </A>)DIRM_0</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DIRM_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A204</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DIRECTION_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Direction mode for bank 0 0 = input 1 = output Each bit configures the corresponding pin within the 32-bit bank</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>DIRM_0@0XE000A204</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Direction mode configuration register: Configures bank 0 for direction mode, either input or output</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>DIR MODE BANK 1</H1>
+<H1>MASK_DATA_0_LSW HIGH BANK [15:0]</H1>
+<H2><a name="MASK_DATA_0_LSW">Register (<A href=#mod___slcr> slcr </A>)MASK_DATA_0_LSW</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:16</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff0000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>feff</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Mask values to be applied on writes to the corresponding GPIO pins 0 = pin value is updated 1 = pin is masked Each bit controls the corresponding pin within the 16-bit half-bank Write Only, Read back as zero</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>15:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Data values read from or written to the corresponding GPIO pins Each bit controls the corresponding pin within the 16-bit half-bank Note: Bit[6], bit[7] default value = 0</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MASK_DATA_0_LSW@0XE000A000</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>feff0100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Maskable single-word-based data access register: Mask and data access for the least significant word of this bank of GPIO pins</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>MASK_DATA_0_MSW HIGH BANK [31:16]</H1>
+<H1>MASK_DATA_1_LSW HIGH BANK [47:32]</H1>
+<H1>MASK_DATA_1_MSW HIGH BANK [53:48]</H1>
+<H1>OUTPUT ENABLE BANK 0</H1>
+<H2><a name="OEN_0">Register (<A href=#mod___slcr> slcr </A>)OEN_0</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>OEN_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A208</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>OP_ENABLE_0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Output enables for bank 0 0 = disabled 1 = enabled Each bit configures the corresponding pin within the 32-bit bank</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>OEN_0@0XE000A208</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Output enable register: Configures the output enables of bank 0</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>OUTPUT ENABLE BANK 1</H1>
+<H1>MASK_DATA_0_LSW LOW BANK [15:0]</H1>
+<H2><a name="MASK_DATA_0_LSW">Register (<A href=#mod___slcr> slcr </A>)MASK_DATA_0_LSW</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:16</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff0000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>feff</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Mask values to be applied on writes to the corresponding GPIO pins 0 = pin value is updated 1 = pin is masked Each bit controls the corresponding pin within the 16-bit half-bank Write Only, Read back as zero</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>15:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Data values read from or written to the corresponding GPIO pins Each bit controls the corresponding pin within the 16-bit half-bank Note: Bit[6], bit[7] default value = 0</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MASK_DATA_0_LSW@0XE000A000</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Maskable single-word-based data access register: Mask and data access for the least significant word of this bank of GPIO pins</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>MASK_DATA_0_MSW LOW BANK [31:16]</H1>
+<H1>MASK_DATA_1_LSW LOW BANK [47:32]</H1>
+<H1>MASK_DATA_1_MSW LOW BANK [53:48]</H1>
+<H1>ADD 1 MS DELAY</H1>
+<H1>MASK_DATA_0_LSW HIGH BANK [15:0]</H1>
+<H2><a name="MASK_DATA_0_LSW">Register (<A href=#mod___slcr> slcr </A>)MASK_DATA_0_LSW</a></H2>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Register Name</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Address</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Width</B>
+</TD>
+<TD width=10% BGCOLOR=#FFFF00>
+<B>Type</B>
+</TD>
+<TD width=15% BGCOLOR=#FFFF00>
+<B>Reset Value</B>
+</TD>
+<TD width=35% BGCOLOR=#FFFF00>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0XE000A000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>32</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>rw</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>0x00000000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>--</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1 cellspacing=0 BORDERCOLOR=black WIDTH=100%">
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Field Name</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Bits</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Mask</B>
+</TD>
+<TD width=10% BGCOLOR=#C0FFC0>
+<B>Value</B>
+</TD>
+<TD width=15% BGCOLOR=#C0FFC0>
+<B>Shifted Value</B>
+</TD>
+<TD width=35% BGCOLOR=#C0FFC0>
+<B>Description</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>MASK_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>31:16</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff0000</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>feff</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>feff0000</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Mask values to be applied on writes to the corresponding GPIO pins 0 = pin value is updated 1 = pin is masked Each bit controls the corresponding pin within the 16-bit half-bank Write Only, Read back as zero</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>DATA_0_LSW</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>15:0</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>ffff</B>
+</TD>
+<TD width=10% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=15% BGCOLOR=#FBF5EF>
+<B>100</B>
+</TD>
+<TD width=35% BGCOLOR=#FBF5EF>
+<B>Data values read from or written to the corresponding GPIO pins Each bit controls the corresponding pin within the 16-bit half-bank Note: Bit[6], bit[7] default value = 0</B>
+</TD>
+</TR>
+<TR valign="top">
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>MASK_DATA_0_LSW@0XE000A000</B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>31:0</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B>ffffffff</B>
+</TD>
+<TD width=10% BGCOLOR=#C0C0C0>
+<B></B>
+</TD>
+<TD width=15% BGCOLOR=#C0C0C0>
+<B>feff0100</B>
+</TD>
+<TD width=35% BGCOLOR=#C0C0C0>
+<B>Maskable single-word-based data access register: Mask and data access for the least significant word of this bank of GPIO pins</B>
+</TD>
+</TR>
+</TABLE>
+<P>
+<H1>MASK_DATA_0_MSW HIGH BANK [31:16]</H1>
+<H1>MASK_DATA_1_LSW HIGH BANK [47:32]</H1>
+<H1>MASK_DATA_1_MSW HIGH BANK [53:48]</H1>
 <H1>ENET RESET</H1>
 <H1>I2C RESET</H1>
 <H1>NOR CHIP SELECT</H1>
