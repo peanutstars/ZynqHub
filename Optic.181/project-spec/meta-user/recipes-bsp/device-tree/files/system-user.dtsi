@@ -8,4 +8,24 @@
             reg = <0x51>;
         };
     };
+/*    
+    usb_phy0: phy0 {
+        compatible = "ulpi-phy";
+        #phy-cells = <0>;
+        reg = <0xe0002000 0x1000>;
+        view-port = <0x170>;
+        drv-vbus;
+    };
+*/
+    usb_phy0: usb_phy@0 {
+        compatible = "usb-nop-xceiv";
+        #phy-cells = <0>;
+    };
 };
+
+&usb0 {
+    status = "okay";
+    dr_mode = "host";
+    usb-phy = <&usb_phy0>;
+};
+
