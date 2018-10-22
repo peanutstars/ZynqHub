@@ -4135,6 +4135,11 @@ CONFIG_bridge-utils=y
 CONFIG_py.gpio=y
 
 #
+# modules 
+#
+CONFIG_olfb=y
+
+#
 # user packages 
 #
 CONFIG_iperf3=y
