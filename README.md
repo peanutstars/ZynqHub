@@ -12,14 +12,14 @@
 
 ### help
 
-source MicroZED.182/source.env  
+source Optic.181/source.env  
 zynq
 
 #### Create with the based HDF
 
-source MicroZED.182/source.env  
-zynq create \`pwd\`/hdf.182  
-cd MicroZED.182
+source Optic.181/source.env  
+zynq create \`pwd\`/optic.hdf  
+cd Optic.181
 zynq build  
 zynq build  
 zynq image
@@ -32,7 +32,7 @@ zynq copy [FOLDER_OF_SD_PARTITION_1]
 
 ## Make RootFS to Partition 2 of SD-Card
 
- 
+
 
 ## Booting Time
 
