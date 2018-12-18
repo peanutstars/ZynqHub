@@ -7,6 +7,7 @@ inherit module
 
 SRC_URI = "file://Makefile \
            file://olfb.c \
+           file://debug.h \
 	   file://COPYING \
           "
 

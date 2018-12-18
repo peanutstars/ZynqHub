@@ -1,5 +1,5 @@
 /*
- *  olfb.c -- Virtual frame buffer device
+ *  linux/drivers/video/vfb.c -- Virtual frame buffer device
  *
  *      Copyright (C) 2002 James Simmons
  *
@@ -23,8 +23,6 @@
 #include <linux/fb.h>
 #include <linux/init.h>
 
-#include "debug.h"
-
     /*
      *  RAM we reserve for the frame buffer. This defines the maximum screen
      *  size
@@ -32,116 +30,65 @@
      *  The default can be overridden if the driver is compiled as a module
      */
 
-#define VFB_OL							1
-#define VFB_OL_PHYSICAL_ADDRESS			0xa0000000
-#define VFB_OL_PHYSICAL_SIZE			0x2000000
-#define ENABLE_MEM_REGION				0
+#define VIDEOMEMSIZE	(1*1024*1024)	/* 1 MB */
 
 static void *videomemory;
-#if VFB_OL
-static u_long videomemorysize = VFB_OL_PHYSICAL_SIZE;
-#else
-#define VIDEOMEMSIZE	(1*1024*1024)	/* 1 MB */
 static u_long videomemorysize = VIDEOMEMSIZE;
-#endif
 module_param(videomemorysize, ulong, 0);
+MODULE_PARM_DESC(videomemorysize, "RAM available to frame buffer (in bytes)");
 
-/**********************************************************************
- *
- * Memory management
- *
- **********************************************************************/
-#if VFB_OL
-#else
-static void *rvmalloc(unsigned long size)
-{
-	void *mem;
-	unsigned long adr;
+static char *mode_option = NULL;
+module_param(mode_option, charp, 0);
+MODULE_PARM_DESC(mode_option, "Preferred video mode (e.g. 640x480-8@60)");
 
-	size = PAGE_ALIGN(size);
-	mem = vmalloc_32(size);
-	if (!mem)
-		return NULL;
-
-	memset(mem, 0, size); /* Clear the ram out, no junk to the user */
-	adr = (unsigned long) mem;
-	while (size > 0) {
-		SetPageReserved(vmalloc_to_page((void *)adr));
-		adr += PAGE_SIZE;
-		size -= PAGE_SIZE;
-	}
-
-	return mem;
-}
-
-static void rvfree(void *mem, unsigned long size)
-{
-	unsigned long adr;
-
-	if (!mem)
-		return;
-
-	adr = (unsigned long) mem;
-	while ((long) size > 0) {
-		ClearPageReserved(vmalloc_to_page((void *)adr));
-		adr += PAGE_SIZE;
-		size -= PAGE_SIZE;
-	}
-	vfree(mem);
-}
-#endif /* VFB_OL */
-
-static struct fb_var_screeninfo vfb_default = {
-	.xres =		1920,
-	.yres =		1080,
-	.xres_virtual =	1920,
-	.yres_virtual =	1080,
-	.bits_per_pixel = 24,
-	.red =		{ 0, 8, 0 },
-    .green =	{ 8, 8, 0 },
-    .blue =		{ 16, 8, 0 },
-//	.activate =	FB_ACTIVATE_TEST,
-	.activate =	FB_ACTIVATE_NOW,
-    .height =	1920,
-    .width =	1080,
-//	.pixclock =	20000,
-//	.left_margin =	64,
-//	.right_margin =	64,
-//	.upper_margin =	32,
-//	.lower_margin =	32,
-//	.hsync_len =	64,
-//	.vsync_len =	2,
+static const struct fb_videomode vfb_default = {
+	.xres =		640,
+	.yres =		480,
+	.pixclock =	20000,
+	.left_margin =	64,
+	.right_margin =	64,
+	.upper_margin =	32,
+	.lower_margin =	32,
+	.hsync_len =	64,
+	.vsync_len =	2,
 	.vmode =	FB_VMODE_NONINTERLACED,
 };
 
 static struct fb_fix_screeninfo vfb_fix = {
-	.id =		"olfb",
+	.id =		"Virtual FB",
 	.type =		FB_TYPE_PACKED_PIXELS,
-	.visual =	FB_VISUAL_TRUECOLOR,
-//	.visual =	FB_VISUAL_PSEUDOCOLOR,
-//	.xpanstep =	1,
-//	.ypanstep =	1,
-//	.ywrapstep =	1,
+	.visual =	FB_VISUAL_PSEUDOCOLOR,
+	.xpanstep =	1,
+	.ypanstep =	1,
+	.ywrapstep =	1,
 	.accel =	FB_ACCEL_NONE,
 };
 
 static bool vfb_enable __initdata = 1;	/* disabled by default */
+module_param(vfb_enable, bool, 0);
+MODULE_PARM_DESC(vfb_enable, "Enable Virtual FB driver");
 
-static int vfb_check_var(struct fb_var_screeninfo *var, struct fb_info *info);
+static int vfb_check_var(struct fb_var_screeninfo *var,
+			 struct fb_info *info);
 static int vfb_set_par(struct fb_info *info);
-static int vfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue, u_int transp, struct fb_info *info);
-static int vfb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info);
+static int vfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
+			 u_int transp, struct fb_info *info);
+static int vfb_pan_display(struct fb_var_screeninfo *var,
+			   struct fb_info *info);
+static int vfb_mmap(struct fb_info *info,
+		    struct vm_area_struct *vma);
 
 static struct fb_ops vfb_ops = {
-//	.fb_read        = fb_sys_read,
-//	.fb_write       = fb_sys_write,
+	.fb_read        = fb_sys_read,
+	.fb_write       = fb_sys_write,
 	.fb_check_var	= vfb_check_var,
-	.fb_set_par		= vfb_set_par,
+	.fb_set_par	= vfb_set_par,
 	.fb_setcolreg	= vfb_setcolreg,
-//	.fb_pan_display	= vfb_pan_display,
+	.fb_pan_display	= vfb_pan_display,
 	.fb_fillrect	= sys_fillrect,
 	.fb_copyarea	= sys_copyarea,
 	.fb_imageblit	= sys_imageblit,
+	.fb_mmap	= vfb_mmap,
 };
 
     /*
@@ -152,14 +99,9 @@ static u_long get_line_length(int xres_virtual, int bpp)
 {
 	u_long length;
 
-#if VFB_OL
 	length = xres_virtual * bpp;
 	length = (length + 31) & ~31;
 	length >>= 3;
-#else
-	length = xres_virtual * bpp;
-	length >>= 3;
-#endif
 	return (length);
 }
 
@@ -171,7 +113,8 @@ static u_long get_line_length(int xres_virtual, int bpp)
      *  data from it to check this var. 
      */
 
-static int vfb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
+static int vfb_check_var(struct fb_var_screeninfo *var,
+			 struct fb_info *info)
 {
 	u_long line_length;
 
@@ -218,12 +161,10 @@ static int vfb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 	/*
 	 *  Memory limit
 	 */
-	line_length = get_line_length(var->xres_virtual, var->bits_per_pixel);
-#if VFB_OL
-#else
+	line_length =
+	    get_line_length(var->xres_virtual, var->bits_per_pixel);
 	if (line_length * var->yres_virtual > videomemorysize)
 		return -ENOMEM;
-#endif
 
 	/*
 	 * Now that we checked it we alter var. The reason being is that the video
@@ -298,8 +239,8 @@ static int vfb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
  */
 static int vfb_set_par(struct fb_info *info)
 {
-	info->fix.line_length = 
-		get_line_length(info->var.xres_virtual, info->var.bits_per_pixel);
+	info->fix.line_length = get_line_length(info->var.xres_virtual,
+						info->var.bits_per_pixel);
 	return 0;
 }
 
@@ -421,11 +362,20 @@ static int vfb_pan_display(struct fb_var_screeninfo *var,
 	return 0;
 }
 
+    /*
+     *  Most drivers don't need their own mmap function 
+     */
+
+static int vfb_mmap(struct fb_info *info,
+		    struct vm_area_struct *vma)
+{
+	return remap_vmalloc_range(vma, (void *)info->fix.smem_start, vma->vm_pgoff);
+}
 
 #ifndef MODULE
 /*
  * The virtual framebuffer driver is only enabled if explicitly
- * requested by passing 'video=olfb:' (or any actual options).
+ * requested by passing 'video=vfb:' (or any actual options).
  */
 static int __init vfb_setup(char *options)
 {
@@ -447,6 +397,8 @@ static int __init vfb_setup(char *options)
 		/* Test disable for backwards compatibility */
 		if (!strcmp(this_opt, "disable"))
 			vfb_enable = 0;
+		else
+			mode_option = this_opt;
 	}
 	return 1;
 }
@@ -459,42 +411,14 @@ static int __init vfb_setup(char *options)
 static int vfb_probe(struct platform_device *dev)
 {
 	struct fb_info *info;
+	unsigned int size = PAGE_ALIGN(videomemorysize);
 	int retval = -ENOMEM;
 
 	/*
 	 * For real video cards we use ioremap.
 	 */
-#if VFB_OL
-# if ENABLE_MEM_REGION
-	if (!request_mem_region(VFB_OL_PHYSICAL_ADDRESS, VFB_OL_PHYSICAL_SIZE, "olfb")) {
-		DBG("request_mem_region (failed)\n");
-		return -ENXIO;
-	}
-# endif
-	videomemorysize = VFB_OL_PHYSICAL_SIZE;
-//	videomemory = ioremap_nocache (VFB_OL_PHYSICAL_ADDRESS, videomemorysize);
-	videomemory = ioremap (VFB_OL_PHYSICAL_ADDRESS, videomemorysize);
-	if (videomemory == NULL) {
-		DBG("ioremap_nocache(failed)\n");
-# if ENABLE_MEM_REGION
-		release_mem_region (VFB_OL_PHYSICAL_SIZE, videomemorysize);
-# endif
+	if (!(videomemory = vmalloc_32_user(size)))
 		return retval;
-	}
-#else
-	if (!(videomemory = rvmalloc(videomemorysize)))
-		return retval;
-#endif
-
-	/*
-	 * VFB must clear memory to prevent kernel info
-	 * leakage into userspace
-	 * VGA-based drivers MUST NOT clear memory if
-	 * they want to be able to take over vgacon
-	 */
-#if 0
-	memset(videomemory, 0, videomemorysize);
-#endif
 
 	info = framebuffer_alloc(sizeof(u32) * 256, &dev->dev);
 	if (!info)
@@ -503,19 +427,14 @@ static int vfb_probe(struct platform_device *dev)
 	info->screen_base = (char __iomem *)videomemory;
 	info->fbops = &vfb_ops;
 
-#if VFB_OL
-	info->var = vfb_default;
-#else
-	retval = fb_find_mode(&info->var, info, NULL, NULL, 0, NULL, 8);
-	if (!retval || (retval == 4))
-		info->var = vfb_default;
-#endif
+	if (!fb_find_mode(&info->var, info, mode_option,
+			  NULL, 0, &vfb_default, 8)){
+		fb_err(info, "Unable to find usable video mode.\n");
+		retval = -EINVAL;
+		goto err1;
+	}
 
-#if VFB_OL
-	vfb_fix.smem_start = (unsigned long) VFB_OL_PHYSICAL_ADDRESS;
-#else
 	vfb_fix.smem_start = (unsigned long) videomemory;
-#endif
 	vfb_fix.smem_len = videomemorysize;
 	info->fix = vfb_fix;
 	info->pseudo_palette = info->par;
@@ -523,31 +442,23 @@ static int vfb_probe(struct platform_device *dev)
 	info->flags = FBINFO_FLAG_DEFAULT;
 
 	retval = fb_alloc_cmap(&info->cmap, 256, 0);
-	if (retval < 0) {
+	if (retval < 0)
 		goto err1;
-	}
 
 	retval = register_framebuffer(info);
-	if (retval < 0) {
+	if (retval < 0)
 		goto err2;
-	}
 	platform_set_drvdata(dev, info);
 
-	fb_info(info, "Virtual frame buffer device, using %ldK of video memory\n", videomemorysize >> 10);
+	fb_info(info, "Virtual frame buffer device, using %ldK of video memory\n",
+		videomemorysize >> 10);
 	return 0;
 err2:
 	fb_dealloc_cmap(&info->cmap);
 err1:
 	framebuffer_release(info);
 err:
-#if VFB_OL
-	iounmap (videomemory);
-#if ENABLE_MEM_REGION
-	release_mem_region (VFB_OL_PHYSICAL_ADDRESS, videomemorysize);
-#endif
-#else
-	rvfree(videomemory, videomemorysize);
-#endif
+	vfree(videomemory);
 	return retval;
 }
 
@@ -557,14 +468,7 @@ static int vfb_remove(struct platform_device *dev)
 
 	if (info) {
 		unregister_framebuffer(info);
-#if VFB_OL
-		iounmap (info->screen_base);
-#if ENABLE_MEM_REGION
-		release_mem_region (VFB_OL_PHYSICAL_ADDRESS, videomemorysize);
-#endif
-#else
-		rvfree(videomemory, videomemorysize);
-#endif
+		vfree(videomemory);
 		fb_dealloc_cmap(&info->cmap);
 		framebuffer_release(info);
 	}
@@ -575,7 +479,7 @@ static struct platform_driver vfb_driver = {
 	.probe	= vfb_probe,
 	.remove = vfb_remove,
 	.driver = {
-		.name	= "olfb",
+		.name	= "vfb",
 	},
 };
 
@@ -585,11 +489,10 @@ static int __init vfb_init(void)
 {
 	int ret = 0;
 
-	DBG(__DATE__ " " __TIME__ "\n");
 #ifndef MODULE
 	char *option = NULL;
 
-	if (fb_get_options("olfb", &option))
+	if (fb_get_options("vfb", &option))
 		return -ENODEV;
 	vfb_setup(option);
 #endif
@@ -600,7 +503,7 @@ static int __init vfb_init(void)
 	ret = platform_driver_register(&vfb_driver);
 
 	if (!ret) {
-		vfb_device = platform_device_alloc("olfb", 0);
+		vfb_device = platform_device_alloc("vfb", 0);
 
 		if (vfb_device)
 			ret = platform_device_add(vfb_device);
@@ -626,7 +529,6 @@ static void __exit vfb_exit(void)
 }
 
 module_exit(vfb_exit);
-#endif				/* MODULE */
 
-MODULE_AUTHOR("hslee");
 MODULE_LICENSE("GPL");
+#endif				/* MODULE */
