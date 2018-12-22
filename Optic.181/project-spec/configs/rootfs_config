@@ -4133,11 +4133,13 @@ CONFIG_bridge-utils=y
 # CONFIG_gpio-demo is not set
 # CONFIG_peekpoke is not set
 CONFIG_py.gpio=y
+CONFIG_xplapp=y
 
 #
 # modules 
 #
 CONFIG_olfb=y
+CONFIG_xpldrv=y
 
 #
 # user packages 
