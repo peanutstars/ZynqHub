@@ -7,8 +7,8 @@
     -offset 0 \
     -fsbl zynq_fsbl.elf \
     -flash_type qspi_single \
-    -verify \
     -cable type xilinx_tcf url TCP:127.0.0.1:3121
 
 #     -blank_check
+#     -verify \
 
