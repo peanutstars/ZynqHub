@@ -1,4 +1,19 @@
 #!/usr/bin/env python3
+'''
+    GPIO
+    54      LED 0
+    55      LED 1
+    56      LED 2
+    57      LED 3
+    62      Buzz
+    70      FAN
+    78      GPIO 0
+    79      GPIO 1
+    80      GPIO 2
+    81      GPIO 3
+    82      GPIO 4
+    83      GPIO 5
+'''
 
 import codecs
 import os
