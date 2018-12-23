@@ -29,14 +29,42 @@
 *
 */
 
-#include <stdio.h>
+#include <inttypes.h>
+#include "xplioctl.h"
 #include "debug.h"
+
+extern int activate_vdma_0(int base, int hsize, int vsize, int fb_base);
+
+
+void initialize(void)
+{
+    xpl_open();
+    activate_vdma_0(0, 1920, 1080, 0x60000000);
+}
+
+void finalize(void)
+{
+    xpl_close();
+}
+
+void check_xpl_interface(void)
+{
+    uint32_t version;
+
+    reg_read32(0x2C, &version);
+    printf("VDMA Version %08X\n", version);
+}
 
 int main(int argc, char **argv)
 {
+    initialize();
+
     printf("Hello World!\n");
     DBG("Debug\n");
     ERR("Error\n");
 
+    check_xpl_interface();
+
+    finalize();
     return 0;
 }
