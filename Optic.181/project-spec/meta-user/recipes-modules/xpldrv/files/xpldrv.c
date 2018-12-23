@@ -12,7 +12,7 @@
 #include <linux/fs.h>
 #include <linux/errno.h>
 #include <linux/ioport.h>
-#include <linux/miscdevice.h>
+//#include <linux/miscdevice.h>
 #include <linux/delay.h>
 #include <asm/io.h>
 #include <linux/uaccess.h>
@@ -22,26 +22,32 @@
 
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("hslee");
+MODULE_AUTHOR("HSLee");
 
 #ifndef VM_RESERVED
 #define VM_RESERVED  (VM_DONTEXPAND | VM_DONTDUMP)
 #endif 
 
 #define USE_XPL_PERI_BASE_ADDR		1
+#define USE_XPL_DDR_BASE_ADDR       1
 
 #if USE_XPL_PERI_BASE_ADDR
-static unsigned long xpl_peri_base_addr = 0x43000000;
+static unsigned long xpl_peri_base_addr     = 0x43000000;
+static int xpl_peri_size                    = 0x00010000;
+static void* xpl_peri_base                  = NULL;
 #endif 
-static unsigned long ddr3_base_addr = 0x60000000;
+#if USE_XPL_DDR_BASE_ADDR
+static unsigned long ddr3_base_addr         = 0x60000000;
+static int ddr3_size                        = 0x00100000;
+static void* ddr3_base                      = NULL;
+#endif
 
-#if USE_XPL_PERI_BASE_ADDR
-static int xpl_peri_size = 0x01000000;
-#endif 
-static int ddr3_size = 0x04000000;
-
+module_param(xpl_peri_base_addr,  ulong, S_IRUSR);
+MODULE_PARM_DESC(xpl_peri_base_addr, "xpl periperal base address");
+#if USE_XPL_DDR_BASE_ADDR
 module_param(ddr3_base_addr,  ulong, S_IRUSR);
-MODULE_PARM_DESC(ddr3_base_addr, "clkwzd base address");
+MODULE_PARM_DESC(ddr3_base_addr, "ddr base address");
+#endif
 
 struct mmap_info 
 {
@@ -49,10 +55,6 @@ struct mmap_info
 	int reference;
 };
 
-#if USE_XPL_PERI_BASE_ADDR
-static void * xpl_peri_base = NULL;
-#endif 
-static void * ddr3_base = NULL;
 
 /* 
  * This is called whenever a process attempts to open the device file 
@@ -175,6 +177,7 @@ long xpl_ioctl(
             }
 			writel(stReg.reg_data, xpl_peri_base + stReg.reg_addr);
 			break;
+
 		case IOCTL_XPL_PERI_RD:
 			if (copy_from_user(&stReg, argp, sizeof(struct ioctl_reg))){
 				return -EACCES;
@@ -187,12 +190,14 @@ long xpl_ioctl(
 			}
 			break;
     #endif //
+    #if USE_XPL_DDR_BASE_ADDR
 		case IOCTL_DDR3_WR32:
 			if (copy_from_user(&stReg, argp, sizeof(struct ioctl_reg))){
 				return -EACCES;
             }
 			writel(stReg.reg_data, ddr3_base + stReg.reg_addr);
 			break;
+
 		case IOCTL_DDR3_RD32:
 			if (copy_from_user(&stReg, argp, sizeof(struct ioctl_reg))){
 				return -EACCES;
@@ -202,6 +207,7 @@ long xpl_ioctl(
 				return -EFAULT;
 			}
 			break;
+    #endif
 
 	}
 	return 0;
@@ -223,11 +229,39 @@ const static struct file_operations xpldrv_fops = {
 	.mmap           = xpl_mmap,
 };
 
-static struct miscdevice xpldrv_dev = {
-	.minor          = MISC_DYNAMIC_MINOR,
-	.name           = DEVICE_NAME,
-	.fops           = &xpldrv_fops,
-};
+//static struct miscdevice xpldrv_dev = {
+//	.minor          = MISC_DYNAMIC_MINOR,
+//	.name           = DEVICE_NAME,
+//	.fops           = &xpldrv_fops,
+//};
+
+static void check_vdma_version(void)
+{
+    uint32_t *version = (uint32_t *)(xpl_peri_base+0x2C);
+    uint32_t regv = *version;
+    printk(KERN_INFO "VDMA VERSION: %d.%d%d\n", 
+            regv>>28, (regv>>24)&0xF, (regv>>20)&0xF);
+}
+
+static void check_ddr_memory(void)
+{
+    uint32_t *mem = (uint32_t *)ddr3_base;
+    int i, limit = ddr3_size/16;
+    int fg_fail = 0;
+    for (i=0; i<limit; i++) {
+        *(mem+i) = i;
+    }
+    for (i=0; i<limit; i++) {
+        if (*(mem+i) != i) {
+            printk(KERN_ERR "Memroy Error at %p:%p\n",
+                    ddr3_base+(i<<2), mem+i);
+            fg_fail = 1;
+        }
+    }
+    if (fg_fail == 0) {
+        printk(KERN_INFO "VIDEO Meory Okay.\n");
+    }
+}
 
 static int __init xpl_init(void)
 {
@@ -237,8 +271,8 @@ static int __init xpl_init(void)
 	/* 
 	 * Register the character device (atleast try) 
 	 */
-	ret_val = misc_register(&xpldrv_dev);
-//	ret_val = register_chrdev(MAJOR_NUM, DEVICE_NAME, &fops);
+//	ret_val = misc_register(&xpldrv_dev);
+	ret_val = register_chrdev(MAJOR_NUM, DEVICE_NAME, &xpldrv_fops);
 
 	/* 
 	 * Negative values signify an error 
@@ -248,38 +282,42 @@ static int __init xpl_init(void)
 		       "Sorry, registering the character device ", ret_val);
 		return ret_val;
 	}
-	printk(KERN_INFO "XPL Driver \n=============\n");
+	printk(KERN_INFO "XPL Driver\n=============\n");
 #if USE_XPL_PERI_BASE_ADDR
+/*
+    // Already defined the address of the xpl peri area from vdma in the dts.
 	printk(KERN_INFO "xpl_peri_base_addr = 0x%08lx\n", xpl_peri_base_addr);
 
-	pstRes = request_mem_region(xpl_peri_base_addr, xpl_peri_size, "xpl_peri");
-	if (pstRes == NULL)
-	{
+	pstRes = request_mem_region(xpl_peri_base_addr, xpl_peri_size, DEVICE_NAME);
+	if (pstRes == NULL) {
 		printk(KERN_ERR "requst_mem_region(0x%08x, 0x%08x) failed\n", 
 			(int)xpl_peri_base_addr, (int)xpl_peri_size);
 		return -1;
 	}
+*/
 	xpl_peri_base = ioremap(xpl_peri_base_addr, xpl_peri_size);
 	if (xpl_peri_base == NULL)
 		printk(KERN_ERR "xpl_peri_base ioremap failed\n");
 
+    printk(KERN_INFO "XPL Base IOREMAP:%08X ->  %p\n", xpl_peri_base_addr, xpl_peri_base);
+    check_vdma_version();
+
 #endif
-#if 1
-	
+#if USE_XPL_DDR_BASE_ADDR
 	pstRes = request_mem_region(ddr3_base_addr, ddr3_size, "pl_ddr3");
-	if (pstRes == NULL)
-	{
-		printk(KERN_ERR "requst_mem_region(0x%08x, 0x%08x) failed\n", 
-			(int)ddr3_base_addr, (int)ddr3_size);
-		return -1;
-	}
+    if (pstRes == NULL) {
+        printk(KERN_ERR "requst_mem_region(0x%08x, 0x%08x) failed\n", 
+                (int)ddr3_base_addr, (int)ddr3_size);
+        return -1;
+    }
 	ddr3_base = ioremap(ddr3_base_addr, ddr3_size);
-	if (ddr3_base == NULL)
+	if (ddr3_base == NULL) {
 		printk(KERN_ERR "ddr_base ioremap failed\n");
-	else
-	{
-		printk(KERN_INFO "ddr3_base = %p\n", ddr3_base);
-	}
+		release_mem_region(ddr3_base_addr, ddr3_size);
+        return -1;
+    }
+	printk(KERN_INFO "ddr3_base = %p\n", ddr3_base);
+	check_ddr_memory();
 #endif 		
 	return 0;
 }
@@ -292,20 +330,23 @@ static void __exit xpl_exit(void)
 	/* 
 	 * Unregister the device 
 	 */
-	//unregister_chrdev(MAJOR_NUM, DEVICE_NAME);
-	misc_deregister (&xpldrv_dev);
+	unregister_chrdev(MAJOR_NUM, DEVICE_NAME);
+//	misc_deregister (&xpldrv_dev);
 	
+#if USE_XPL_DDR_BASE_ADDR
 	if (ddr3_base)
 	{
 		iounmap(ddr3_base);
 		release_mem_region(ddr3_base_addr, ddr3_size);
 	}
+#endif
 	
 #if USE_XPL_PERI_BASE_ADDR
 	if (xpl_peri_base)
 	{
 		iounmap(xpl_peri_base);
 		release_mem_region(xpl_peri_base_addr, xpl_peri_size);
+        xpl_peri_base = NULL;
 	}
 #endif 
 }

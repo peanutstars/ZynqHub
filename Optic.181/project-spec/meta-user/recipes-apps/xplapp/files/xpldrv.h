@@ -8,7 +8,7 @@
 #include <linux/ioctl.h>
 
 #define DEVICE_NAME		    "xpldrv"
-#define MAJOR_NUM           74
+#define MAJOR_NUM           100
 
 struct ioctl_reg
 {
