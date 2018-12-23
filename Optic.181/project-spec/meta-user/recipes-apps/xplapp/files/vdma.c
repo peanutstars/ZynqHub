@@ -22,12 +22,14 @@ uint32_t XAxiVdma_ReadReg(UINTPTR base, int offset)
     if (reg_read32(_offset, &regv) != IOK) {
         ERR("READ32(offset:%06X)", _offset);
     }
+    DBG("RD32:%06X -> %08X\n", _offset, regv);
     return regv;
 }
 
 void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
 {
     uint32_t _offset = (uint32_t)base + offset;
+    DBG("WR32:%06X <- %08X\n", _offset, data);
     if (reg_write32(_offset, data) != IOK) {
         ERR("WRITE32(offset:%06X, %08X)", _offset, data);
     }
@@ -1975,4 +1977,6 @@ int activate_vdma_0(int base, int hsize, int vsize, int fb_base)
         return status;
     }
     /* ************ DMA engine start done *************** */
+
+    return XST_SUCCESS;
 }

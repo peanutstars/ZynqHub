@@ -3,6 +3,8 @@ APP = xplapp
 # Add any other object files to this list below
 APP_OBJS = xplapp.o xplioctl.o vdma.o
 
+CFLAGS  := -Wall -g
+
 all: build
 
 build: $(APP)
