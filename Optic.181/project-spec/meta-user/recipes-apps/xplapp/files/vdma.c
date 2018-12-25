@@ -694,6 +694,7 @@ int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
    CrBits |= (ChannelCfgPtr->PointNum << XAXIVDMA_CR_RD_PTR_SHIFT) &
        XAXIVDMA_CR_RD_PTR_MASK;
 
+   DBG("%4d: CrBits=%08X\n", __LINE__, CrBits);
    /* Write the control register value out
     */
    XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
@@ -807,6 +808,8 @@ int XAxiVdma_ChannelSetBufferAddr(XAxiVdma_Channel *Channel,
         FrmBound = (XAXIVDMA_MAX_FRAMESTORE)/2 - 1;
     }
     int Loop16 = 0;
+    printf("@ %4d:%s NumFrames=%d\n",__LINE__, __FUNCTION__, NumFrames);
+    printf("@ %4d:%s Addr=%X\n",__LINE__, __FUNCTION__, BufferAddrSet[0]);
 
     if (!Channel->IsValid) {
         xdbg_printf(XDBG_DEBUG_ERROR, "Channel not initialized\r\n");
@@ -852,11 +855,13 @@ int XAxiVdma_ChannelSetBufferAddr(XAxiVdma_Channel *Channel,
                     Loop16 * XAXIVDMA_START_ADDR_LEN + i*4,
                     LOWER_32_BITS(BufferAddrSet[i]));
 
+                printf("@ %4d:%s\n",__LINE__, __FUNCTION__);
                 XAxiVdma_WriteReg(Channel->StartAddrBase,
                     XAXIVDMA_START_ADDR_MSB_OFFSET +
                     Loop16 * XAXIVDMA_START_ADDR_LEN + i*4,
                     UPPER_32_BITS((u64)BufferAddrSet[i]));
             } else {
+                printf("@ %4d:%s\n",__LINE__, __FUNCTION__);
                 XAxiVdma_WriteReg(Channel->StartAddrBase,
                     XAXIVDMA_START_ADDR_OFFSET +
                     Loop16 * XAXIVDMA_START_ADDR_LEN,
@@ -1262,6 +1267,7 @@ void XAxiVdma_ChannelRegisterDump(XAxiVdma_Channel *Channel)
  *****************************************************************************/
 static u32 XAxiVdma_BdRead(XAxiVdma_Bd *BdPtr, int Offset)
 {
+    DBG("@@@@: RD %08X\n", (uint32_t)BdPtr+Offset);
     return (*(u32 *)((UINTPTR)(void *)BdPtr + Offset));
 }
 
@@ -1279,6 +1285,7 @@ static u32 XAxiVdma_BdRead(XAxiVdma_Bd *BdPtr, int Offset)
  *****************************************************************************/
 static void XAxiVdma_BdWrite(XAxiVdma_Bd *BdPtr, int Offset, u32 Value)
 {
+    DBG("@@@@: WR %08X <- %08X\n", (uint32_t)BdPtr+Offset, Value);
     *(u32 *)((UINTPTR)(void *)BdPtr + Offset) = Value;
 
     return;
@@ -1916,10 +1923,43 @@ void XAxiVdma_DmaRegisterDump(XAxiVdma *InstancePtr, u16 Direction)
     return;
 }
 
-
-
-int activate_vdma_0(int base, int hsize, int vsize, int fb_base)
+#if 0
+int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
 {
+    uint32_t HActive = hsize * 4;
+    uint32_t VActive = vsize;
+    uint32_t Stride = hsize * 8;
+    uint32_t regv = 0;
+    int i;
+
+    XAxiVdma_WriteReg(0, 0, 4); // Reset
+    XAxiVdma_WriteReg(0, 0, 0); // Normal
+
+//  regv |= (1 << 1);  // Circular Buffer
+//  regv |= (1 << 3);  // GenLock Enable
+//  regv |= (1 << 7);  // GenLock Internal Source
+    regv |= (1 << 12); // Enable FrameCount Irq Enable
+    regv |= (1 << 0);  // Run
+    regv = 0x89;
+    regv |= (1 << 14);
+    XAxiVdma_WriteReg(0, 0, regv);
+    XAxiVdma_ReadReg(0, 0);
+    XAxiVdma_WriteReg(0, 0x58, Stride);
+    XAxiVdma_WriteReg(0, 0x54, HActive);
+//    XAxiVdma_WriteReg(0, 0x28, 4);
+
+    for (i=0; i<4; i++) {
+        regv = fb_mem[0] + i*Stride*VActive;
+        XAxiVdma_WriteReg(0, 0x5C+4*i, regv);
+    }
+
+    XAxiVdma_WriteReg(0, 0x50, VActive);
+    return 0;
+}
+#else
+int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
+{
+    int i;
     int status;
     XAxiVdma_Config *Config;
 
@@ -1936,6 +1976,7 @@ int activate_vdma_0(int base, int hsize, int vsize, int fb_base)
     }
 
     u32 stride = hsize * (Config->Mm2SStreamWidth>>3);
+    printf("hsize: %d  Width: %d\n", hsize, Config->Mm2SStreamWidth);
 
     /* ************************************************** */
     /*           Setup the read channel                   */
@@ -1958,7 +1999,7 @@ int activate_vdma_0(int base, int hsize, int vsize, int fb_base)
     }
 
     /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
-    status = XAxiVdma_DmaSetBufferAddr(&InstancePtr, XAXIVDMA_READ, (UINTPTR *) fb_base);
+    status = XAxiVdma_DmaSetBufferAddr(&InstancePtr, XAXIVDMA_READ, (UINTPTR *)fb_mem);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
         return status;
@@ -1971,6 +2012,7 @@ int activate_vdma_0(int base, int hsize, int vsize, int fb_base)
     /* ************************************************** */
 
     /* Start the Read channel of DMA Engine */
+    DBG("Start VDMA\n");
     status = XAxiVdma_DmaStart(&InstancePtr, XAXIVDMA_READ);
     if (status != XST_SUCCESS) {
         xil_printf("Failed to start DMA engine (read channel), status: 0x%X\r\n", status);
@@ -1978,5 +2020,12 @@ int activate_vdma_0(int base, int hsize, int vsize, int fb_base)
     }
     /* ************ DMA engine start done *************** */
 
+    for(i=0; i<100; i++) {
+        printf("------------\n");
+        XAxiVdma_ReadReg(0x0, 0x4);
+        XAxiVdma_ReadReg(0x0, 0x0);
+        sleep(1);
+    }
     return XST_SUCCESS;
 }
+#endif

@@ -61,7 +61,8 @@
 #define XDBG_DEBUG_TEMAC_ADPT_MISC   0x00000803    /* debug msg for other routines */
 #define XDBG_DEBUG_TEMAC_ADPT_ALL    0x0000080F    /* all temac adapter debug messages */
 
-#define xdbg_current_types (XDBG_DEBUG_ERROR)
+//#define xdbg_current_types (XDBG_DEBUG_ERROR)
+#define xdbg_current_types (XDBG_DEBUG_ALL)
 
 #define xdbg_stmnt(x)  x
 
