@@ -295,7 +295,8 @@ static int __init xpl_init(void)
 		return -1;
 	}
 */
-	xpl_peri_base = ioremap(xpl_peri_base_addr, xpl_peri_size);
+//	xpl_peri_base = ioremap(xpl_peri_base_addr, xpl_peri_size);
+	xpl_peri_base = ioremap_nocache(xpl_peri_base_addr, xpl_peri_size);
 	if (xpl_peri_base == NULL)
 		printk(KERN_ERR "xpl_peri_base ioremap failed\n");
 
