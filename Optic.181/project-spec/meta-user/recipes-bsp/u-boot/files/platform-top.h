@@ -34,3 +34,7 @@
 #define CONFIG_SYS_I2C_MUX_ADDR                0x74
 #define CONFIG_SYS_I2C_MUX_EEPROM_SEL          0x4
 #endif
+
+#ifdef CONFIG_PREBOOT
+#undef CONFIG_PREBOOT
+#endif
