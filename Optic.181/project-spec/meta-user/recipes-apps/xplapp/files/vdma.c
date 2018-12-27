@@ -1923,43 +1923,8 @@ void XAxiVdma_DmaRegisterDump(XAxiVdma *InstancePtr, u16 Direction)
     return;
 }
 
-#if 0
 int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
 {
-    uint32_t HActive = hsize * 4;
-    uint32_t VActive = vsize;
-    uint32_t Stride = hsize * 8;
-    uint32_t regv = 0;
-    int i;
-
-    XAxiVdma_WriteReg(0, 0, 4); // Reset
-    XAxiVdma_WriteReg(0, 0, 0); // Normal
-
-//  regv |= (1 << 1);  // Circular Buffer
-//  regv |= (1 << 3);  // GenLock Enable
-//  regv |= (1 << 7);  // GenLock Internal Source
-    regv |= (1 << 12); // Enable FrameCount Irq Enable
-    regv |= (1 << 0);  // Run
-    regv = 0x89;
-    regv |= (1 << 14);
-    XAxiVdma_WriteReg(0, 0, regv);
-    XAxiVdma_ReadReg(0, 0);
-    XAxiVdma_WriteReg(0, 0x58, Stride);
-    XAxiVdma_WriteReg(0, 0x54, HActive);
-//    XAxiVdma_WriteReg(0, 0x28, 4);
-
-    for (i=0; i<4; i++) {
-        regv = fb_mem[0] + i*Stride*VActive;
-        XAxiVdma_WriteReg(0, 0x5C+4*i, regv);
-    }
-
-    XAxiVdma_WriteReg(0, 0x50, VActive);
-    return 0;
-}
-#else
-int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
-{
-    int i;
     int status;
     XAxiVdma_Config *Config;
 
@@ -2020,12 +1985,5 @@ int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
     }
     /* ************ DMA engine start done *************** */
 
-    for(i=0; i<100; i++) {
-        printf("------------\n");
-        XAxiVdma_ReadReg(0x0, 0x4);
-        XAxiVdma_ReadReg(0x0, 0x0);
-        sleep(1);
-    }
     return XST_SUCCESS;
 }
-#endif

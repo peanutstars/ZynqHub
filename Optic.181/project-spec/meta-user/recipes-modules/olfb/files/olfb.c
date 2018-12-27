@@ -33,17 +33,17 @@
      */
 
 #define VFB_OL							1
-#define VFB_OL_PHYSICAL_ADDRESS			0xa0000000
-#define VFB_OL_PHYSICAL_SIZE			0x2000000
+#define VFB_OL_PHYSICAL_ADDRESS			0x40000000
+#define VFB_OL_PHYSICAL_SIZE			0x800000
 #define ENABLE_MEM_REGION				0
 
 static void *videomemory;
 #if VFB_OL
-static u_long videomemorysize = VFB_OL_PHYSICAL_SIZE;
+#define VIDEOMEMSIZE    VFB_OL_PHYSICAL_SIZE
 #else
 #define VIDEOMEMSIZE	(1*1024*1024)	/* 1 MB */
-static u_long videomemorysize = VIDEOMEMSIZE;
 #endif
+static u_long videomemorysize = VIDEOMEMSIZE;
 module_param(videomemorysize, ulong, 0);
 
 /**********************************************************************
