@@ -32,13 +32,13 @@ MODULE_AUTHOR("HSLee");
 #define USE_XPL_DDR_BASE_ADDR       1
 
 #if USE_XPL_PERI_BASE_ADDR
-static unsigned long xpl_peri_base_addr     = 0x43000000;
+static unsigned long xpl_peri_base_addr     = 0x83000000;
 static int xpl_peri_size                    = 0x00010000;
 static void* xpl_peri_base                  = NULL;
 #endif 
 #if USE_XPL_DDR_BASE_ADDR
-static unsigned long ddr3_base_addr         = 0x60000000;
-static int ddr3_size                        = 0x00100000;
+static unsigned long ddr3_base_addr         = 0x40000000;
+static int ddr3_size                        = 0x00800000;
 static void* ddr3_base                      = NULL;
 #endif
 
@@ -260,6 +260,14 @@ static void check_ddr_memory(void)
     }
     if (fg_fail == 0) {
         printk(KERN_INFO "VIDEO Meory Okay.\n");
+        for (i=0; i<ddr3_size/4; i++) {
+#if 0
+            *(mem+i) = 0xFF0000; // Red
+            *(mem+i) = 0x00FF00; // Green
+            *(mem+i) = 0x0000FF; // Blue
+#endif
+            *(mem+i) = 0x0;
+        }
     }
 }
 
@@ -311,7 +319,7 @@ static int __init xpl_init(void)
                 (int)ddr3_base_addr, (int)ddr3_size);
         return -1;
     }
-	ddr3_base = ioremap(ddr3_base_addr, ddr3_size);
+	ddr3_base = ioremap_nocache(ddr3_base_addr, ddr3_size);
 	if (ddr3_base == NULL) {
 		printk(KERN_ERR "ddr_base ioremap failed\n");
 		release_mem_region(ddr3_base_addr, ddr3_size);

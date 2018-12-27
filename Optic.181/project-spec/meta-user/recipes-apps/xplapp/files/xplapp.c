@@ -35,7 +35,7 @@
 #include "debug.h"
 
 extern int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_base);
-static uint32_t fb_mem = 0x60000000;
+static uint32_t fb_mem = 0x40000000;
 
 
 void initialize(void)
