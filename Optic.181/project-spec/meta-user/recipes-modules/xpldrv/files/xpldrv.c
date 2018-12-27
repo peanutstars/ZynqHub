@@ -266,7 +266,8 @@ static void check_ddr_memory(void)
             *(mem+i) = 0x00FF00; // Green
             *(mem+i) = 0x0000FF; // Blue
 #endif
-            *(mem+i) = 0x0;
+            *(mem+i) = 0xFF0000; // Red
+//          *(mem+i) = 0x0;
         }
     }
 }
