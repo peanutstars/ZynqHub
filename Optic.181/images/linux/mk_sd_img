@@ -1,0 +1,144 @@
+#!/bin/bash
+
+export LANG=C
+
+DD_BS=1K
+DD_COUNT=1M
+FDISK_PART1=256M
+
+BASE_SD_IMG=sd.img
+SD_IMG_FILE="ol-sd-`date +%Y%m%d-%H%M%S`.img"
+LOOP_DEV=
+FOLDER_P1=p1
+FOLDER_P2=p2
+
+
+if [ "$EUID" -ne 0 ] ; then
+    echo "Please run as 'sudo -E $0'"
+    exit
+fi
+if [ -z "$ROOTPATH" ] ; then
+    echo "Please run as 'sudo -E $0'"
+    exit
+fi
+
+
+
+info() {
+    echo "[I] $*"
+}
+err() {
+    echo "[E] $*"
+    exit -1
+}
+cmd() {
+    echo "[C] $*"
+    $*
+    if [ "$?" == "0" ]; then
+        echo "PASS"
+    else
+        echo "FAIL"
+        exit -1
+    fi
+}
+
+detach_loop_device() {
+    LOOP_DEV=`losetup -l | grep "\<$BASE_SD_IMG\>" | awk '{ print $1 }'`
+    if [ -n "$LOOP_DEV" ] ; then
+        umount_partition
+        detach_kpartx
+        losetup -d $LOOP_DEV
+        info "Released Loop Device"
+    fi
+}
+
+attach_loop_device() {
+    cmd losetup -f $BASE_SD_IMG
+    LOOP_DEV=`losetup -l | grep "\<$BASE_SD_IMG\>" | awk '{ print $1 }'`
+    LOOP_NAME=`basename $LOOP_DEV`
+    if [ -n "$LOOP_DEV" ] ; then
+        info "Attached Loop Device: $LOOP_DEV"
+    else
+        err "Failed to attach Loop Device."
+    fi
+}
+
+detach_kpartx() {
+    local loop_name=`basename $LOOP_DEV`
+    local has_kpartx=`ls /dev/mapper/${loop_name}* 2>/dev/null`
+    if [ -n "$has_kpartx" ] ; then
+        cmd kpartx -d $LOOP_DEV
+    fi
+}
+
+attach_kpartx() {
+    cmd kpartx -a $LOOP_DEV
+    sleep 0.3
+    local has_kpartx=`ls /dev/mapper/${LOOP_NAME}* 2>/dev/null`
+    if [ -z "$has_kpartx" ] ; then
+        err "Failed to attach kpartx."
+    fi
+}
+
+
+generate_empty_image() {
+    cmd dd if=/dev/zero of=$BASE_SD_IMG bs=$DD_BS count=$DD_COUNT
+}
+
+make_partition() {
+    info make partition
+    fdisk $LOOP_DEV 2>&1 >/dev/null << EOF
+n
+p
+1
+
++$FDISK_PART1
+
+n
+p
+2
+
+
+w
+EOF
+}
+
+format_partition() {
+    cmd mkfs.vfat /dev/mapper/${LOOP_NAME}p1 > /dev/null
+    cmd mkfs.ext4 /dev/mapper/${LOOP_NAME}p2 > /dev/null
+}
+
+mount_partition() {
+    mkdir $FOLDER_P1 && cmd mount -t vfat /dev/mapper/${LOOP_NAME}p1 $FOLDER_P1
+    mkdir $FOLDER_P2 && cmd mount -t ext4 /dev/mapper/${LOOP_NAME}p2 $FOLDER_P2
+}
+
+umount_partition() {
+    [ -e "$FOLDER_P1" ] && (umount $FOLDER_P1; rm -rf $FOLDER_P1) && info umount $FOLDER_P1
+    [ -e "$FOLDER_P2" ] && (umount $FOLDER_P2; rm -rf $FOLDER_P2) && info umount $FOLDER_P2
+}
+
+fill_partition_up() {
+    cmd cp image.ub $FOLDER_P1
+    cmd tar xf rootfs.tar.gz -C $FOLDER_P2
+    cmd fakeroot cp -a $ROOTPATH/../rootfs/* $FOLDER_P2
+}
+
+fixing() {
+    cmd mv $BASE_SD_IMG $SD_IMG_FILE
+    chown `users`:`users` $SD_IMG_FILE
+}
+
+###################
+# START
+detach_loop_device
+generate_empty_image
+attach_loop_device
+make_partition
+attach_kpartx
+format_partition
+mount_partition
+fill_partition_up
+detach_loop_device
+fixing
+
