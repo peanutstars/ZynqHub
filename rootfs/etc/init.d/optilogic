@@ -1,5 +1,4 @@
 #!/bin/bash
 
 ifconfig eth0 192.168.1.200
-mknod /dev/xpldrv c 100 0
 

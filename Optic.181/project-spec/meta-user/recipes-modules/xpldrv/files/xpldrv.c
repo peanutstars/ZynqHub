@@ -12,7 +12,7 @@
 #include <linux/fs.h>
 #include <linux/errno.h>
 #include <linux/ioport.h>
-//#include <linux/miscdevice.h>
+#include <linux/miscdevice.h>
 #include <linux/delay.h>
 #include <asm/io.h>
 #include <linux/uaccess.h>
@@ -229,11 +229,11 @@ const static struct file_operations xpldrv_fops = {
 	.mmap           = xpl_mmap,
 };
 
-//static struct miscdevice xpldrv_dev = {
-//	.minor          = MISC_DYNAMIC_MINOR,
-//	.name           = DEVICE_NAME,
-//	.fops           = &xpldrv_fops,
-//};
+static struct miscdevice xpldrv_dev = {
+	.minor          = MISC_DYNAMIC_MINOR,
+	.name           = "xpl",
+	.fops           = &xpldrv_fops,
+};
 
 static void check_vdma_version(void)
 {
@@ -280,8 +280,8 @@ static int __init xpl_init(void)
 	/* 
 	 * Register the character device (atleast try) 
 	 */
-//	ret_val = misc_register(&xpldrv_dev);
-	ret_val = register_chrdev(MAJOR_NUM, DEVICE_NAME, &xpldrv_fops);
+	ret_val = misc_register(&xpldrv_dev);
+//	ret_val = register_chrdev(MAJOR_NUM, DEVICE_NAME, &xpldrv_fops);
 
 	/* 
 	 * Negative values signify an error 
@@ -340,8 +340,8 @@ static void __exit xpl_exit(void)
 	/* 
 	 * Unregister the device 
 	 */
-	unregister_chrdev(MAJOR_NUM, DEVICE_NAME);
-//	misc_deregister (&xpldrv_dev);
+//	unregister_chrdev(MAJOR_NUM, DEVICE_NAME);
+	misc_deregister (&xpldrv_dev);
 	
 #if USE_XPL_DDR_BASE_ADDR
 	if (ddr3_base)

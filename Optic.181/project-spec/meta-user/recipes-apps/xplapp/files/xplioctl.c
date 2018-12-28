@@ -11,7 +11,7 @@
 #include "debug.h"
 
 
-#define XPL_DRIVER      "/dev/xpldrv"
+#define XPL_DRIVER      "/dev/xpl"
 
 static int xplfd = NOFD;
 
