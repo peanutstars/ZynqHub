@@ -119,6 +119,8 @@ umount_partition() {
 }
 
 fill_partition_up() {
+    [ ! -e "image.ub" ] && err "Not Exists image.ub"
+    [ ! -e "rootfs.tar.gz" ] && err "Not Exists rootfs.tar.gz"
     cmd cp image.ub $FOLDER_P1
     cmd tar xf rootfs.tar.gz -C $FOLDER_P2
     cmd fakeroot cp -a $ROOTPATH/../rootfs/* $FOLDER_P2
@@ -127,18 +129,21 @@ fill_partition_up() {
 fixing() {
     cmd mv $BASE_SD_IMG $SD_IMG_FILE
     chown `users`:`users` $SD_IMG_FILE
+    sync
+    sync
 }
 
 ###################
 # START
-detach_loop_device
-generate_empty_image
-attach_loop_device
-make_partition
-attach_kpartx
-format_partition
-mount_partition
-fill_partition_up
-detach_loop_device
-fixing
-
+pushd $ROOTPATH/images/linux
+    detach_loop_device
+    generate_empty_image
+    attach_loop_device
+    make_partition
+    attach_kpartx
+    format_partition
+    mount_partition
+    fill_partition_up
+    detach_loop_device
+    fixing
+popd

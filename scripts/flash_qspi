@@ -2,6 +2,8 @@
 
 #source /opt/Xilinx/SDK/2018.1/settings64.sh
 
+pushd $ROOTPATH/images/linux
+
 /opt/Xilinx/SDK/2018.1/bin/program_flash \
     -f BOOT.BIN \
     -offset 0 \
@@ -12,3 +14,4 @@
 #     -blank_check
 #     -verify \
 
+popd
