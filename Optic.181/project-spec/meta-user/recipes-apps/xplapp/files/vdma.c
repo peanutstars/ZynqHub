@@ -694,7 +694,6 @@ int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
    CrBits |= (ChannelCfgPtr->PointNum << XAXIVDMA_CR_RD_PTR_SHIFT) &
        XAXIVDMA_CR_RD_PTR_MASK;
 
-   DBG("%4d: CrBits=%08X\n", __LINE__, CrBits);
    /* Write the control register value out
     */
    XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
@@ -808,8 +807,8 @@ int XAxiVdma_ChannelSetBufferAddr(XAxiVdma_Channel *Channel,
         FrmBound = (XAXIVDMA_MAX_FRAMESTORE)/2 - 1;
     }
     int Loop16 = 0;
-    printf("@ %4d:%s NumFrames=%d\n",__LINE__, __FUNCTION__, NumFrames);
-    printf("@ %4d:%s Addr=%X\n",__LINE__, __FUNCTION__, BufferAddrSet[0]);
+//  printf("@ %4d:%s NumFrames=%d\n",__LINE__, __FUNCTION__, NumFrames);
+//  printf("@ %4d:%s Addr=%X\n",__LINE__, __FUNCTION__, BufferAddrSet[0]);
 
     if (!Channel->IsValid) {
         xdbg_printf(XDBG_DEBUG_ERROR, "Channel not initialized\r\n");
@@ -855,13 +854,13 @@ int XAxiVdma_ChannelSetBufferAddr(XAxiVdma_Channel *Channel,
                     Loop16 * XAXIVDMA_START_ADDR_LEN + i*4,
                     LOWER_32_BITS(BufferAddrSet[i]));
 
-                printf("@ %4d:%s\n",__LINE__, __FUNCTION__);
+//              printf("@ %4d:%s\n",__LINE__, __FUNCTION__);
                 XAxiVdma_WriteReg(Channel->StartAddrBase,
                     XAXIVDMA_START_ADDR_MSB_OFFSET +
                     Loop16 * XAXIVDMA_START_ADDR_LEN + i*4,
                     UPPER_32_BITS((u64)BufferAddrSet[i]));
             } else {
-                printf("@ %4d:%s\n",__LINE__, __FUNCTION__);
+//              printf("@ %4d:%s\n",__LINE__, __FUNCTION__);
                 XAxiVdma_WriteReg(Channel->StartAddrBase,
                     XAXIVDMA_START_ADDR_OFFSET +
                     Loop16 * XAXIVDMA_START_ADDR_LEN,
@@ -1267,7 +1266,7 @@ void XAxiVdma_ChannelRegisterDump(XAxiVdma_Channel *Channel)
  *****************************************************************************/
 static u32 XAxiVdma_BdRead(XAxiVdma_Bd *BdPtr, int Offset)
 {
-    DBG("@@@@: RD %08X\n", (uint32_t)BdPtr+Offset);
+    DBG("%s: RD %08X\n", __FUNCTION__, (uint32_t)BdPtr+Offset);
     return (*(u32 *)((UINTPTR)(void *)BdPtr + Offset));
 }
 
@@ -1285,7 +1284,7 @@ static u32 XAxiVdma_BdRead(XAxiVdma_Bd *BdPtr, int Offset)
  *****************************************************************************/
 static void XAxiVdma_BdWrite(XAxiVdma_Bd *BdPtr, int Offset, u32 Value)
 {
-    DBG("@@@@: WR %08X <- %08X\n", (uint32_t)BdPtr+Offset, Value);
+    DBG("%s: WR %08X <- %08X\n", __FUNCTION__, (uint32_t)BdPtr+Offset, Value);
     *(u32 *)((UINTPTR)(void *)BdPtr + Offset) = Value;
 
     return;
@@ -1941,7 +1940,7 @@ int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
     }
 
     u32 stride = hsize * (Config->Mm2SStreamWidth>>3);
-    printf("hsize: %d  Width: %d\n", hsize, Config->Mm2SStreamWidth);
+//  printf("hsize: %d  Width: %d\n", hsize, Config->Mm2SStreamWidth);
 
     /* ************************************************** */
     /*           Setup the read channel                   */

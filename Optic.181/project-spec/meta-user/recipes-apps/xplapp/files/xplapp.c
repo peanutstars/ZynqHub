@@ -31,42 +31,59 @@
 
 #include <inttypes.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include "xplioctl.h"
 #include "debug.h"
 
 extern int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_base);
-static uint32_t fb_mem = 0x40000000;
+void check_xpl_interface(void);
 
 
-void initialize(void)
+static uint32_t _fb_mem = 0x40000000;
+
+
+void initialize(uint32_t *fb_mem)
 {
     xpl_open();
-    activate_vdma_0(0, 1920, 1080, &fb_mem);
+    check_xpl_interface();
+    activate_vdma_0(0, 1920, 1080, fb_mem);
 }
 
 void finalize(void)
 {
-    sleep(1);
+    usleep(1000);
     xpl_close();
 }
 
 void check_xpl_interface(void)
 {
-    uint32_t version;
+    uint32_t regv;
+    int major, minor;
 
-    reg_read32(0x2C, &version);
-    printf("VDMA Version %08X\n", version);
+    reg_read32(0x2C, &regv);
+    major = regv >> 28;
+    minor = (regv >> 20) & 0xFF;
+    printf("VDMA Core Version %X.%02X\n", major, minor);
+    if (major == 6 && minor == 0x20)
+        return;
+
+    fprintf(stderr, "VDMA Core Version is not matched.\n");
+    exit(1);
 }
 
 int main(int argc, char **argv)
 {
-    initialize();
+    uint32_t *fb_mem = &_fb_mem;
+    uint32_t addr;
 
-    printf("Hello World!\n");
-    DBG("Debug\n");
-    ERR("Error\n");
+    if (argc >= 2) {
+        addr = strtoul(argv[1], NULL, 0);
+        fb_mem = &addr;
+    }
 
-    check_xpl_interface();
+    initialize(fb_mem);
+
+    printf("Set Memory Address of Frame Buffer: 0x%08X\n", *fb_mem);
 
     finalize();
     return 0;
