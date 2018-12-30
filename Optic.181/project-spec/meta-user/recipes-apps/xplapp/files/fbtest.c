@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>  
 #include <stdlib.h>  
 #include <string.h>  
@@ -8,21 +9,115 @@
 #include <sys/mman.h>  
 #include <sys/ioctl.h>
 
+typedef uint8_t Color;
+
+struct Config {
+    char *fb_device;
+    int fd;
+    Color order[3][3];
+};
+
+void* get_color_order(char* mode) 
+{
+    void* order = NULL;
+    if ( ! strcasecmp(mode, "RGB")) {
+        static Color c[3][3] = {
+            {0, 0, 255},
+            {0, 255, 0},
+            {255, 0, 0},
+        };
+        order = c;
+    } else if ( ! strcasecmp(mode, "RBG")) {
+        static Color c[3][3] = {
+            {0, 0, 255},
+            {255, 0, 0},
+            {0, 255, 0},
+        };
+        order = c;
+    } else if ( ! strcasecmp(mode, "GRB")) {
+        static Color c[3][3] = {
+            {0, 255, 0},
+            {0, 0, 255},
+            {255, 0, 0},
+        };
+        order = c;
+    } else if ( ! strcasecmp(mode, "GBR")) {
+        static Color c[3][3] = {
+            {0, 255, 0},
+            {255, 0, 0},
+            {0, 0, 255},
+        };
+        order = c;
+    } else if ( ! strcasecmp(mode, "BRG")) {
+        static Color c[3][3] = {
+            {255, 0, 0},
+            {0, 0, 255},
+            {0, 255, 0},
+        };
+        order = c;
+    } else {
+        static Color c[3][3] = {
+            {255, 0, 0},
+            {0, 255, 0},
+            {0, 0, 255},
+        };
+        order = c;
+    }
+    return order;
+}
+
+void init_config(struct Config *cfg, int argc, char *argv[])
+{
+    int opt;
+    int fb_num = 0;
+    char fb_device[32];
+    Color order[3][3];
+
+    memcpy(order, get_color_order("RGB"), sizeof(order));
+
+    while ((opt = getopt(argc, argv, "hf:c:")) != -1) {
+        switch (opt) {
+            case 'f':
+                fb_num = strtoul(optarg, NULL, 0);
+                break;
+            case 'c':
+                memcpy(order, get_color_order(optarg), sizeof(order));
+                break;
+            case 'h':
+            default: /* '?' */
+                fprintf(stderr, 
+                        "  Usage: %s [-f <num>] [-c <order>]\n"
+                        "    -f <num>       Set a Number of a frame buffer.\n"
+                        "    -c <order>     Set a color order - BGR, BRG, RGB, RBG, GBR or GRB\n" 
+                        "\n",
+                        argv[0]);
+                exit(EXIT_FAILURE);
+        }
+    }
+
+    snprintf(fb_device, sizeof(fb_device), "/dev/fb%d", fb_num);
+    cfg->fb_device = strdup(fb_device);
+    memcpy(cfg->order, order, sizeof(order));
+}
 
 int main( int argc, char* argv[] )  
 {  
-    int framebuffer_fd = 0;  
+    struct Config cfg;
     struct fb_var_screeninfo framebuffer_variable_screeninfo;  
     struct fb_fix_screeninfo framebuffer_fixed_screeninfo;  
 
-    framebuffer_fd = open( "/dev/fb0", O_RDWR );  
-    if ( framebuffer_fd <  0 ){  
+    memset(&cfg, 0, sizeof(cfg));
+    init_config(&cfg, argc, argv);
+
+    printf("Frame Buffer: %s\n", cfg.fb_device);
+    cfg.fd = open( cfg.fb_device, O_RDWR );  
+    if ( cfg.fd <  0 ){  
         perror( "Error: cannot open framebuffer device\n" );  
         exit(1);  
     }  
 
 
-    if ( ioctl(framebuffer_fd, FBIOGET_VSCREENINFO,   
+    if ( ioctl(cfg.fd, FBIOGET_VSCREENINFO,   
                 &framebuffer_variable_screeninfo) )  
     {  
         perror( "Error: reading variable screen infomation\n" );  
@@ -30,7 +125,7 @@ int main( int argc, char* argv[] )
     }  
     framebuffer_variable_screeninfo.bits_per_pixel=32;  
 
-    if ( ioctl(framebuffer_fd, FBIOPUT_VSCREENINFO,   
+    if ( ioctl(cfg.fd, FBIOPUT_VSCREENINFO,   
                 &framebuffer_variable_screeninfo) )  
     {  
         perror( "Error: reading variable screen infomation\n" );  
@@ -39,7 +134,7 @@ int main( int argc, char* argv[] )
 
 
 
-    if ( ioctl(framebuffer_fd, FBIOGET_FSCREENINFO,   
+    if ( ioctl(cfg.fd, FBIOGET_FSCREENINFO,   
                 &framebuffer_fixed_screeninfo) )  
     {  
         perror( "Error: reading fixed screen infomation\n" );  
@@ -65,7 +160,7 @@ int main( int argc, char* argv[] )
     char *framebuffer_pointer = (char*)mmap( 0, screensize,  
             PROT_READ|PROT_WRITE,  
             MAP_SHARED,  
-            framebuffer_fd, 0 );  
+            cfg.fd, 0 );  
 
     if ( framebuffer_pointer == MAP_FAILED )  
     {  
@@ -75,29 +170,29 @@ int main( int argc, char* argv[] )
     else  
     {  
         int x,y;  
-        for ( y=0; y<height; y++)  
+        int y_limit = height/2;
+        for ( y=0; y<y_limit; y++)  
             for ( x=0; x<width; x++)  
             {  
                 unsigned int pixel_offset = (y+yoffset)*framebuffer_fixed_screeninfo.line_length*2 +(x+xoffset)*bpp;  
 
-
                 if (bpp==4){  
                     if ( x<=width*1/3){    
-                        framebuffer_pointer[pixel_offset]=255;//B  
-                        framebuffer_pointer[pixel_offset+1]=0;//G  
-                        framebuffer_pointer[pixel_offset+2]=0;//R  
+                        framebuffer_pointer[pixel_offset]=cfg.order[0][0];//B  
+                        framebuffer_pointer[pixel_offset+1]=cfg.order[0][1];//G  
+                        framebuffer_pointer[pixel_offset+2]=cfg.order[0][2];//R  
                         framebuffer_pointer[pixel_offset+3]=0;//A  
                     }  
                     if ( x>width*1/3 && x<=width*2/3){      
-                        framebuffer_pointer[pixel_offset]=0;//B  
-                        framebuffer_pointer[pixel_offset+1]=255;//G  
-                        framebuffer_pointer[pixel_offset+2]=0;//R  
+                        framebuffer_pointer[pixel_offset]=cfg.order[1][0];//B  
+                        framebuffer_pointer[pixel_offset+1]=cfg.order[1][1];//G  
+                        framebuffer_pointer[pixel_offset+2]=cfg.order[1][2];//R  
                         framebuffer_pointer[pixel_offset+3]=0;//A  
                     }  
                     if ( x>width*2/3){     
-                        framebuffer_pointer[pixel_offset]=0;//B  
-                        framebuffer_pointer[pixel_offset+1]=0;//G  
-                        framebuffer_pointer[pixel_offset+2]=255;//R  
+                        framebuffer_pointer[pixel_offset]=cfg.order[2][0];//B  
+                        framebuffer_pointer[pixel_offset+1]=cfg.order[2][1];//G  
+                        framebuffer_pointer[pixel_offset+2]=cfg.order[2][2];//R  
                         framebuffer_pointer[pixel_offset+3]=0;//A  
                     }  
                 }  
@@ -107,7 +202,7 @@ int main( int argc, char* argv[] )
     }   
 
     munmap( framebuffer_pointer, screensize );   
-    close( framebuffer_fd );  
+    close( cfg.fd );  
 
     return 0;
 }  

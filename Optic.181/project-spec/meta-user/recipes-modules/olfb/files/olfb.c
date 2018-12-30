@@ -523,11 +523,13 @@ static int vfb_probe(struct platform_device *dev)
     #endif
     
     #if VFB_OL
-    	vfb_fix.smem_start = (unsigned long) VFB_OL_PHYSICAL_BASE;
+    	vfb_fix.smem_start = (unsigned long) VFB_OL_PHYSICAL_BASE + idx*VIDEOMEMSIZE;
+    	// vfb_fix.smem_start = (unsigned long) videomemory + idx*VIDEOMEMSIZE;
+    	vfb_fix.smem_len = VIDEOMEMSIZE;
     #else
     	vfb_fix.smem_start = (unsigned long) videomemory;
-    #endif
     	vfb_fix.smem_len = videomemorysize;
+    #endif
     	info->fix = vfb_fix;
     	info->pseudo_palette = info->par;
     	info->par = NULL;
@@ -586,7 +588,7 @@ static int vfb_remove(struct platform_device *dev)
     	}
     }
 #if VFB_OL
-    iounmap (info->screen_base);
+    iounmap (videomemory);
 # if ENABLE_MEM_REGION
     release_mem_region (VFB_OL_PHYSICAL_BASE, videomemorysize);
 # endif
