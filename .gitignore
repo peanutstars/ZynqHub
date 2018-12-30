@@ -3,4 +3,5 @@
 components/linux-xlnx
 components/u-boot-xlnx
 tags
+*.png
 

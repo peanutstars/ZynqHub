@@ -71,6 +71,7 @@ p
 
 w
 EOF
+    cmd e2fsck -f ${SD_DISK}2
     cmd resize2fs ${SD_DISK}2
 }
 
