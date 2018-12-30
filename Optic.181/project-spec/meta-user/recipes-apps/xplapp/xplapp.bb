@@ -16,6 +16,7 @@ SRC_URI = "file://xplapp.c \
 	   file://xilinx/xdebug.h \
 	   file://xilinx/xaxivdma_hw.h \
 	   file://xilinx/xiltypes.h \
+	   file://fbtest.c \
 	   file://Makefile \
 		  "
 
@@ -28,4 +29,5 @@ do_compile() {
 do_install() {
 	     install -d ${D}${bindir}
 	     install -m 0755 xplinit ${D}${bindir}
+	     install -m 0755 fbtest ${D}${bindir}
 }

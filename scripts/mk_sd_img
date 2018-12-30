@@ -128,7 +128,7 @@ fill_partition_up() {
 
 fixing() {
     cmd mv $BASE_SD_IMG $SD_IMG_FILE
-    chown `users`:`users` $SD_IMG_FILE
+    cmd chown $SUDO_USER:$SUDO_USER $SD_IMG_FILE
     sync
     sync
 }
