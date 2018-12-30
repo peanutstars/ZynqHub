@@ -12,31 +12,32 @@
 
 ### help
 
-source Optic.181/source.env  
-zynq
+    source Optic.181/source.env  
+    zynq
 
 #### Create with the based HDF
 
-source Optic.181/source.env  
-zynq create \`pwd\`/optic.hdf  
-cd Optic.181
-zynq build  
-zynq build  
-zynq image
+    source Optic.181/source.env  
+    zynq create \`pwd\`/optic.hdf  
+    cd Optic.181
+    zynq build  
+    zynq build  
+    zynq image
 
-#### Booting with SD-Card
+## SD-card Image
 
-## Copy BOOT.BIN and image.ub to partition 1 of SD-Card  
+#### Generate Image
 
-zynq copy [FOLDER_OF_SD_PARTITION_1]
+Generate SD-card image file which this file has two partitions.  First partition is FAT32 and contains a kernel image file.  Second partition is EXT4 and this is root file-system.
 
-## Make RootFS to Partition 2 of SD-Card
+    zynq sd-img
 
+#### Create SD-card
 
+    zynq sd-disk <dev-file> <sd-img-file>
 
-## Booting Time
+#### Root File-System
 
-Displayed a message to request DHCP after pressed a reset button.
-
-QSPI Flash + /dev/mmcblk0p2: About 8 seconds  
-SD-Card + /dev/mmcblk0p2: About 11.5 seconds  
+All files in get_root/rootfs apply to the final generated rootfs image.  
+If you make a deploy image, please remove follow files:
+  + git_root/etc/dropbear/dropbear_rsa_host_key

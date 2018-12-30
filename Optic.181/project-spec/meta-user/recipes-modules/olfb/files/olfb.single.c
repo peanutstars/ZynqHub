@@ -11,7 +11,6 @@
  */
 
 #include <linux/module.h>
-#include <linux/moduleparam.h>
 #include <linux/kernel.h>
 #include <linux/errno.h>
 #include <linux/string.h>
@@ -34,21 +33,18 @@
      */
 
 #define VFB_OL							1
-#define VFB_OL_PHYSICAL_BASE			0x40000000
-#define VFB_OL_SIZE			            0x800000
+#define VFB_OL_PHYSICAL_ADDRESS			0x40000000
+#define VFB_OL_PHYSICAL_SIZE			0x800000
 #define ENABLE_MEM_REGION				0
 
 static void *videomemory;
 #if VFB_OL
-#define VIDEOMEMSIZE    VFB_OL_SIZE
+#define VIDEOMEMSIZE    VFB_OL_PHYSICAL_SIZE
 #else
 #define VIDEOMEMSIZE	(1*1024*1024)	/* 1 MB */
 #endif
-static u_long videocount = 1;
-module_param(videocount, ulong, 0);
-MODULE_PARM_DESC(videocount, "Frame Buffer Count");
-
 static u_long videomemorysize = VIDEOMEMSIZE;
+module_param(videomemorysize, ulong, 0);
 
 /**********************************************************************
  *
@@ -462,33 +458,26 @@ static int __init vfb_setup(char *options)
 
 static int vfb_probe(struct platform_device *dev)
 {
-    struct fb_info **_info = NULL;
-	struct fb_info *info = NULL;
+	struct fb_info *info;
 	int retval = -ENOMEM;
-    int idx, ei;
-
-    videomemorysize = VIDEOMEMSIZE * videocount;
-    printk(KERN_INFO "Video Count=%ld, Memory Size:0x%08lX\n", videocount, videomemorysize);
-    _info = vmalloc(sizeof(struct fb_info *)*videocount);
-    memset(_info, 0, sizeof(struct fb_info *)*videocount);
-
 
 	/*
 	 * For real video cards we use ioremap.
 	 */
 #if VFB_OL
 # if ENABLE_MEM_REGION
-	if (!request_mem_region(VFB_OL_PHYSICAL_BASE, VFB_OL_SIZE, "olfb")) {
+	if (!request_mem_region(VFB_OL_PHYSICAL_ADDRESS, VFB_OL_PHYSICAL_SIZE, "olfb")) {
 		DBG("request_mem_region (failed)\n");
 		return -ENXIO;
 	}
 # endif
-	videomemory = ioremap_nocache (VFB_OL_PHYSICAL_BASE, videomemorysize);
-//	videomemory = ioremap (VFB_OL_PHYSICAL_BASE, videomemorysize);
+	videomemorysize = VFB_OL_PHYSICAL_SIZE;
+	videomemory = ioremap_nocache (VFB_OL_PHYSICAL_ADDRESS, videomemorysize);
+//	videomemory = ioremap (VFB_OL_PHYSICAL_ADDRESS, videomemorysize);
 	if (videomemory == NULL) {
 		DBG("ioremap_nocache(failed)\n");
 # if ENABLE_MEM_REGION
-		release_mem_region (VFB_OL_SIZE, videomemorysize);
+		release_mem_region (VFB_OL_PHYSICAL_SIZE, videomemorysize);
 # endif
 		return retval;
 	}
@@ -506,94 +495,79 @@ static int vfb_probe(struct platform_device *dev)
 #if 0
 	memset(videomemory, 0, videomemorysize);
 #endif
-    for (idx=0; idx<videocount; idx++) {
-    	_info[idx] = info = framebuffer_alloc(sizeof(u32) * 256, &dev->dev);
-    	if (!info)
-    		goto err;
-    
-    	info->screen_base = (char __iomem *)((uint32_t)videomemory + idx*VIDEOMEMSIZE);
-    	info->fbops = &vfb_ops;
-    
-    #if VFB_OL
-    	info->var = vfb_default;
-    #else
-    	retval = fb_find_mode(&info->var, info, NULL, NULL, 0, NULL, 8);
-    	if (!retval || (retval == 4))
-    		info->var = vfb_default;
-    #endif
-    
-    #if VFB_OL
-    	vfb_fix.smem_start = (unsigned long) VFB_OL_PHYSICAL_BASE;
-    #else
-    	vfb_fix.smem_start = (unsigned long) videomemory;
-    #endif
-    	vfb_fix.smem_len = videomemorysize;
-    	info->fix = vfb_fix;
-    	info->pseudo_palette = info->par;
-    	info->par = NULL;
-    	info->flags = FBINFO_FLAG_DEFAULT;
-    
-    	retval = fb_alloc_cmap(&info->cmap, 256, 0);
-    	if (retval < 0) {
-    		goto err1;
-    	}
-    
-    	retval = register_framebuffer(info);
-    	if (retval < 0) {
-    		goto err2;
-    	}
-        fb_info(info, "Frame buffer Address:%p, Size:%X\n", info->screen_base, VIDEOMEMSIZE);
-    }    
-    platform_set_drvdata(dev, _info);
-    fb_info(info, "OL frame buffer device, using %ldK of video memory\n", videomemorysize >> 10);
-    return 0;
 
+	info = framebuffer_alloc(sizeof(u32) * 256, &dev->dev);
+	if (!info)
+		goto err;
+
+	info->screen_base = (char __iomem *)videomemory;
+	info->fbops = &vfb_ops;
+
+#if VFB_OL
+	info->var = vfb_default;
+#else
+	retval = fb_find_mode(&info->var, info, NULL, NULL, 0, NULL, 8);
+	if (!retval || (retval == 4))
+		info->var = vfb_default;
+#endif
+
+#if VFB_OL
+	vfb_fix.smem_start = (unsigned long) VFB_OL_PHYSICAL_ADDRESS;
+#else
+	vfb_fix.smem_start = (unsigned long) videomemory;
+#endif
+	vfb_fix.smem_len = videomemorysize;
+	info->fix = vfb_fix;
+	info->pseudo_palette = info->par;
+	info->par = NULL;
+	info->flags = FBINFO_FLAG_DEFAULT;
+
+	retval = fb_alloc_cmap(&info->cmap, 256, 0);
+	if (retval < 0) {
+		goto err1;
+	}
+
+	retval = register_framebuffer(info);
+	if (retval < 0) {
+		goto err2;
+	}
+	platform_set_drvdata(dev, info);
+
+	fb_info(info, "Virtual frame buffer device, using %ldK of video memory\n", videomemorysize >> 10);
+	return 0;
 err2:
-    for (ei=0; ei<=idx; ei++) {
-        info = _info[idx];
-	    fb_dealloc_cmap(&info->cmap);
-    }
+	fb_dealloc_cmap(&info->cmap);
 err1:
-    for (ei=0; ei<=idx; ei++) {
-        info = _info[idx];
-    	framebuffer_release(info);
-    }
+	framebuffer_release(info);
 err:
 #if VFB_OL
 	iounmap (videomemory);
-# if ENABLE_MEM_REGION
-	release_mem_region (VFB_OL_PHYSICAL_BASE, videomemorysize);
-# endif
+#if ENABLE_MEM_REGION
+	release_mem_region (VFB_OL_PHYSICAL_ADDRESS, videomemorysize);
+#endif
 #else
 	rvfree(videomemory, videomemorysize);
 #endif
-    vfree(_info);
 	return retval;
 }
 
 static int vfb_remove(struct platform_device *dev)
 {
-	struct fb_info **_info = platform_get_drvdata(dev);
-    struct fb_info *info;
-    int idx;
+	struct fb_info *info = platform_get_drvdata(dev);
 
-    for (idx=0; idx<videocount; idx++) {
-        info = _info[idx];
-    	if (info) {
-    		unregister_framebuffer(info);
-    		fb_dealloc_cmap(&info->cmap);
-    		framebuffer_release(info);
-    	}
-    }
+	if (info) {
+		unregister_framebuffer(info);
 #if VFB_OL
-    iounmap (info->screen_base);
+		iounmap (info->screen_base);
 # if ENABLE_MEM_REGION
-    release_mem_region (VFB_OL_PHYSICAL_BASE, videomemorysize);
+		release_mem_region (VFB_OL_PHYSICAL_ADDRESS, videomemorysize);
 # endif
 #else
-    rvfree(videomemory, videomemorysize);
+		rvfree(videomemory, videomemorysize);
 #endif
-    vfree(_info);
+		fb_dealloc_cmap(&info->cmap);
+		framebuffer_release(info);
+	}
 	return 0;
 }
 
