@@ -4,6 +4,7 @@ KERNEL_INFO=`uname -r`
 MODULE_PATH="/lib/modules/$KERNEL_INFO/extra/"
 VERBOSE="/dev/null"
 
+echo 0 > /sys/class/graphics/fbcon/cursor_blink
 ifconfig eth0 192.168.1.200
 insmod $MODULE_PATH/xpldrv.ko
 insmod $MODULE_PATH/olfb.ko videocount=4

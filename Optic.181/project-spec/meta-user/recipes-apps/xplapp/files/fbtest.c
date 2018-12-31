@@ -15,6 +15,7 @@ struct Config {
     char *fb_device;
     int fd;
     Color order[3][3];
+    int sleep_second;
 };
 
 void* get_color_order(char* mode) 
@@ -75,7 +76,7 @@ void init_config(struct Config *cfg, int argc, char *argv[])
 
     memcpy(order, get_color_order("RGB"), sizeof(order));
 
-    while ((opt = getopt(argc, argv, "hf:c:")) != -1) {
+    while ((opt = getopt(argc, argv, "hf:c:s:")) != -1) {
         switch (opt) {
             case 'f':
                 fb_num = strtoul(optarg, NULL, 0);
@@ -83,12 +84,16 @@ void init_config(struct Config *cfg, int argc, char *argv[])
             case 'c':
                 memcpy(order, get_color_order(optarg), sizeof(order));
                 break;
+            case 's':
+                cfg->sleep_second = strtoul(optarg, NULL, 0);
+                break;
             case 'h':
             default: /* '?' */
                 fprintf(stderr, 
-                        "  Usage: %s [-f <num>] [-c <order>]\n"
+                        "  Usage: %s [-f <num>] [-c <order>] [-s <second>]\n"
                         "    -f <num>       Set a Number of a frame buffer.\n"
                         "    -c <order>     Set a color order - BGR, BRG, RGB, RBG, GBR or GRB\n" 
+                        "    -s <second>    Set the duration of color bar display.\n"
                         "\n",
                         argv[0]);
                 exit(EXIT_FAILURE);
@@ -115,7 +120,6 @@ int main( int argc, char* argv[] )
         perror( "Error: cannot open framebuffer device\n" );  
         exit(1);  
     }  
-
 
     if ( ioctl(cfg.fd, FBIOGET_VSCREENINFO,   
                 &framebuffer_variable_screeninfo) )  
@@ -200,6 +204,13 @@ int main( int argc, char* argv[] )
             }  
 
     }   
+
+    if (cfg.sleep_second > 0) {
+        int x;
+        for (x=0; x<cfg.sleep_second; x++) {
+            sleep(1);
+        }
+    }
 
     munmap( framebuffer_pointer, screensize );   
     close( cfg.fd );  
