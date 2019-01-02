@@ -754,14 +754,14 @@ CONFIG_pciutils=y
 #
 # stat 
 #
-# CONFIG_stat is not set
+CONFIG_stat=y
 # CONFIG_stat-dbg is not set
 # CONFIG_stat-dev is not set
 
 #
 # strace 
 #
-# CONFIG_strace is not set
+CONFIG_strace=y
 # CONFIG_strace-dev is not set
 # CONFIG_strace-dbg is not set
 
@@ -2347,10 +2347,10 @@ CONFIG_gdbserver=y
 #
 # glibc 
 #
-# CONFIG_glibc is not set
-# CONFIG_glibc-dev is not set
+CONFIG_glibc=y
+CONFIG_glibc-dev=y
 # CONFIG_glibc-dbg is not set
-# CONFIG_ldd is not set
+CONFIG_ldd=y
 
 #
 # gnome-desktop-testing 

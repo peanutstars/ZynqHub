@@ -124,6 +124,7 @@ fill_partition_up() {
     cmd cp image.ub $FOLDER_P1
     cmd tar xf rootfs.tar.gz -C $FOLDER_P2
     cmd fakeroot cp -a $ROOTPATH/../rootfs/* $FOLDER_P2
+    cmd du -h --max-depth=1 $FOLDER_P2
 }
 
 fixing() {
