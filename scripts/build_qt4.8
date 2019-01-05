@@ -1,0 +1,162 @@
+#!/bin/bash
+
+##############################
+info() {
+    echo "[I] $*"
+}
+err() {
+    echo "[E] $*"
+    exit -1
+}
+cmd() {
+    echo "[C] $*"
+    $*
+    if [ "$?" == "0" ]; then
+        echo "PASS"
+    else
+        echo "FAIL"
+        exit -1
+    fi
+}
+##############################
+[ ! -e "/opt/Xilinx/Vivado/2018.1/settings64.sh" ] && err "Please install vivado 2018.1 !!"
+[ -z "$ROOTPATH" ] && err "Please run command follow as 'source source.env' in the project folder."
+
+export CROSS_COMPILE=arm-linux-gnueabihf-
+source /opt/Xilinx/Vivado/2018.1/settings64.sh
+
+ZYNQ_QT_SRC_DIR=qt-everywhere-opensource-src-4.8.5
+ZYNQ_QT_SRC_FILE=$ZYNQ_QT_SRC_DIR.tar.gz
+ZYNQ_QT_SRC_LINK=https://download.qt.io/archive/qt/4.8/4.8.5/$ZYNQ_QT_SRC_FILE
+ZYNQ_QT_SRC_MD5=1864987bdbb2f58f8ae8b350dfdbe133
+ZYNQ_QT_INSTALL_DIR=$ROOTPATH/../rootfs/usr
+
+
+download_qt_src() {
+    local has_file=0
+    if [ -e "$ZYNQ_QT_SRC_FILE" ]; then
+        local md5=`md5sum $ZYNQ_QT_SRC_FILE | awk '{ print $1 }'`
+        if [ "$md5" == "$ZYNQ_QT_SRC_MD5" ]; then
+            has_file=1
+            info "Already Exists $ZYNQ_QT_SRC_FILE"
+        else
+            rm -rf $ZYNQ_QT_SRC_FILE
+        fi
+    fi
+    [ "$has_file" -eq "0" ] && cmd curl -Lo $ZYNQ_QT_SRC_FILE $ZYNQ_QT_SRC_LINK
+}
+
+extract_qt_src() {
+    if [ -e "$ZYNQ_QT_SRC_DIR" ]; then
+        info "Already Extracted $ZYNQ_QT_SRC_FILE" 
+    else
+        cmd tar xf $ZYNQ_QT_SRC_FILE
+    fi
+}
+
+build_qt() {
+    #mkdir -p $ZYNQ_QT_INSTALL_DIR
+    pushd $ZYNQ_QT_SRC_DIR
+    mkdir -p mkspecs/qws/linux-arm-gnueabihf-g++/
+    cat > mkspecs/qws/linux-arm-gnueabihf-g++/qmake.conf << EOF
+#
+# qmake configuration for building with arm-none-linux-gnueabi-g++
+#
+
+include(../../common/linux.conf)
+include(../../common/gcc-base-unix.conf)
+include(../../common/g++-unix.conf)
+include(../../common/qws.conf)
+
+# modifications to g++.conf
+QMAKE_CC                = arm-linux-gnueabihf-gcc
+QMAKE_CXX               = arm-linux-gnueabihf-g++
+QMAKE_LINK              = arm-linux-gnueabihf-g++
+QMAKE_LINK_SHLIB        = arm-linux-gnueabihf-g++
+
+
+# modifications to linux.conf
+QMAKE_AR                = arm-linux-gnueabihf-ar cqs 
+QMAKE_OBJCOPY           = arm-linux-gnueabihf-objcopy
+QMAKE_NM                = arm-linux-gnueabihf-nm -P
+QMAKE_STRIP             = arm-linux-gnueabihf-strip
+
+
+QMAKE_CFLAGS           += -march=armv7-a -mcpu=cortex-a9 -mtune=cortex-a9 -mfpu=neon -pipe -fomit-frame-pointer
+QMAKE_CXXFLAGS         += \$\$QMAKE_CFLAGS -std=gnu++98
+
+load(qt_config)
+EOF
+    cat > mkspecs/qws/linux-arm-gnueabihf-g++/qplatformdefs.h << EOF
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
+** Contact: http://www.qt-project.org/legal
+**
+** This file is part of the qmake spec of the Qt Toolkit.
+**
+** \$QT_BEGIN_LICENSE:LGPL$
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.  For licensing terms and
+** conditions see http://qt.digia.com/licensing.  For further information
+** use the contact form at http://qt.digia.com/contact-us.
+**
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+** In addition, as a special exception, Digia gives you certain additional
+** rights.  These rights are described in the Digia Qt LGPL Exception
+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+**
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http://www.gnu.org/copyleft/gpl.html.
+**
+**
+** \$QT_END_LICENSE$
+**
+****************************************************************************/
+
+#include "../../linux-g++/qplatformdefs.h"
+EOF
+    local do_config=0
+    [ ! -e "bin/qmake" ] && do_config=1
+    [ "$QT_RECONFIG" -eq "1" ] && do_config=1
+    if [ "$do_config" -eq "1" ]; then
+        make confclean
+        ./configure \
+                -prefix $ZYNQ_QT_INSTALL_DIR \
+                -opensource \
+                -embedded arm \
+                -xplatform qws/linux-arm-gnueabihf-g++ \
+                -little-endian \
+                -host-little-endian \
+                -confirm-license \
+                -no-webkit \
+                -qt-libtiff \
+                -qt-libpng \
+                -verbose \
+                -no-pch \
+                -no-icu \
+                -nomake demos,docs
+    fi
+    make -j `cat /proc/cpuinfo | grep processor | wc -l` && make install
+    popd
+}
+
+##########################################################
+download_qt_src
+extract_qt_src
+build_qt
