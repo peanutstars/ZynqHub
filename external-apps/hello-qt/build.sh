@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export PATH=$ROOTPATH/../scripts/qt-everywhere-opensource-src-4.8.5/bin:$PATH
+[ -z "$ZYNQ_QT_VERSION" ] && ZYNQ_QT_VERSION=4.8.7
+export PATH=$ROOTPATH/../scripts/qt-everywhere-opensource-src-$ZYNQ_QT_VERSION/bin:$PATH
 DIR_INSTALL=$ROOTPATH/../rootfs/usr/bin
 
 [ ! -e "$DIR_INSTALL" ] && mkdir -p $DIR_INSTALL

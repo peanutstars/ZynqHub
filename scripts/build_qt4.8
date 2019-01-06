@@ -25,10 +25,15 @@ cmd() {
 export CROSS_COMPILE=arm-linux-gnueabihf-
 source /opt/Xilinx/Vivado/2018.1/settings64.sh
 
-ZYNQ_QT_SRC_DIR=qt-everywhere-opensource-src-4.8.5
+## Configure Qt Version
+[ -z "$ZYNQ_QT_VERSION" ] && ZYNQ_QT_VERSION=4.8.7
+
+declare -A ZYNQ_QT_SRC_MD5
+ZYNQ_QT_SRC_DIR=qt-everywhere-opensource-src-$ZYNQ_QT_VERSION
 ZYNQ_QT_SRC_FILE=$ZYNQ_QT_SRC_DIR.tar.gz
-ZYNQ_QT_SRC_LINK=https://download.qt.io/archive/qt/4.8/4.8.5/$ZYNQ_QT_SRC_FILE
-ZYNQ_QT_SRC_MD5=1864987bdbb2f58f8ae8b350dfdbe133
+ZYNQ_QT_SRC_LINK=https://download.qt.io/archive/qt/4.8/$ZYNQ_QT_VERSION/$ZYNQ_QT_SRC_FILE
+ZYNQ_QT_SRC_MD5[4.8.5]=1864987bdbb2f58f8ae8b350dfdbe133
+ZYNQ_QT_SRC_MD5[4.8.7]=d990ee66bf7ab0c785589776f35ba6ad
 ZYNQ_QT_INSTALL_DIR=$ROOTPATH/../rootfs/usr
 
 
@@ -36,7 +41,7 @@ download_qt_src() {
     local has_file=0
     if [ -e "$ZYNQ_QT_SRC_FILE" ]; then
         local md5=`md5sum $ZYNQ_QT_SRC_FILE | awk '{ print $1 }'`
-        if [ "$md5" == "$ZYNQ_QT_SRC_MD5" ]; then
+        if [ "$md5" == "${ZYNQ_QT_SRC_MD5[$ZYNQ_QT_VERSION]}" ]; then
             has_file=1
             info "Already Exists $ZYNQ_QT_SRC_FILE"
         else
