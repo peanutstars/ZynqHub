@@ -34,7 +34,7 @@
      */
 
 #define VFB_OL							1
-#define VFB_OL_PHYSICAL_BASE			0x40000000
+#define VFB_OL_PHYSICAL_BASE			0x50000000
 #define VFB_OL_SIZE			            0x800000
 #define ENABLE_MEM_REGION				0
 
