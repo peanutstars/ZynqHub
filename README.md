@@ -41,3 +41,4 @@ Generate SD-card image file which this file has two partitions.  First partition
 All files in get_root/rootfs apply to the final generated rootfs image.  
 If you make a deploy image, please remove follow files:
   + git_root/etc/dropbear/dropbear_rsa_host_key
+
