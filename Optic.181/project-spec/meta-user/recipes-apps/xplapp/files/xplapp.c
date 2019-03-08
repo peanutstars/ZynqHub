@@ -50,12 +50,15 @@ static uint32_t _fb_mem = 0x40000000;
 void initialize(uint32_t *fb_mem)
 {
     xpl_open();
+    printf("xpl_open OK\n");
     check_xpl_interface();
+    printf("check xpl interface OK\n");
+
     // activate_vdma_0(0, 1920, 1080, fb_mem);
-	activate_vdma_1(0, 1920, 1080, fb_mem);
+	 activate_vdma_1(0, 1920, 1080, fb_mem);
 	// activate_vdma_2(0, 1920, 1080, fb_mem);
-	activate_vdma_3(0, 1920, 1080, fb_mem);
-	activate_vdma_4(0, 1920, 1080, fb_mem);
+	 activate_vdma_3(0, 1920, 1080, fb_mem);
+	  activate_vdma_4(0, 1920, 1080, fb_mem);
 }
 
 void finalize(void)
