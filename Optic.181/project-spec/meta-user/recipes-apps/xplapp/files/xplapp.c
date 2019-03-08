@@ -39,7 +39,7 @@ extern int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_base);
 extern int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base);
 extern int activate_vdma_2(int base, int hsize, int vsize, uint32_t *vdma2_base);
 extern int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_base);
-extern int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base);
+extern int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mode);
 
 void check_xpl_interface(void);
 
@@ -55,10 +55,10 @@ void initialize(uint32_t *fb_mem)
     printf("check xpl interface OK\n");
 
     // activate_vdma_0(0, 1920, 1080, fb_mem);
-	 activate_vdma_1(0, 1920, 1080, fb_mem);
+	activate_vdma_1(0, 1920, 1080, fb_mem);
 	// activate_vdma_2(0, 1920, 1080, fb_mem);
 	 activate_vdma_3(0, 1920, 1080, fb_mem);
-	  activate_vdma_4(0, 1920, 1080, fb_mem);
+	  activate_vdma_4(0, 1920, 1080, fb_mem, 0);
 }
 
 void finalize(void)

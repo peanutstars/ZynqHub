@@ -2138,6 +2138,7 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
 {
     int status;
     XAxiVdma_Config *Config;
+	u32 Addr, storage_offset;
 
     Config = XAxiVdma_LookupConfig(1);
     if (!Config) {
@@ -2174,8 +2175,14 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
         return status;
     }
 
+	storage_offset = ReadCfg1.Stride;
+	Addr = VDMA1_BASE_MEM  + storage_offset;
+	ReadCfg1.FrameStoreStartAddr[0] = Addr;
+
+
     /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
-    status = XAxiVdma_DmaSetBufferAddr(&InstancePtr1, XAXIVDMA_READ, (UINTPTR *)vdma1_base);
+    // status = XAxiVdma_DmaSetBufferAddr(&InstancePtr1, XAXIVDMA_READ, (UINTPTR *)vdma1_base);
+	status = XAxiVdma_DmaSetBufferAddr(&InstancePtr1, XAXIVDMA_READ, ReadCfg1.FrameStoreStartAddr);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
         return status;
@@ -2203,6 +2210,8 @@ int activate_vdma_2(int base, int hsize, int vsize, uint32_t *vdma2_base)
 {
     int status;
     XAxiVdma_Config *Config;
+	u32 Addr;
+	u32 storage_offset;
 
     Config = XAxiVdma_LookupConfig(2);
     if (!Config) {
@@ -2239,8 +2248,15 @@ int activate_vdma_2(int base, int hsize, int vsize, uint32_t *vdma2_base)
         return status;
     }
 
+	storage_offset = ReadCfg2.Stride;
+	Addr = VDMA2_BASE_MEM + storage_offset;
+
+	ReadCfg2.FrameStoreStartAddr[0] = Addr;
+
+
     /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
-    status = XAxiVdma_DmaSetBufferAddr(&InstancePtr2, XAXIVDMA_READ, (UINTPTR *)vdma2_base);
+   //  status = XAxiVdma_DmaSetBufferAddr(&InstancePtr2, XAXIVDMA_READ, (UINTPTR *)vdma2_base);
+	status = XAxiVdma_DmaSetBufferAddr(&InstancePtr2, XAXIVDMA_READ, ReadCfg2.FrameStoreStartAddr);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
         return status;
@@ -2331,10 +2347,12 @@ int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
 }
 
 
-int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base)
+int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mode)
 {
     int status;
     XAxiVdma_Config *Config;
+	u32 Addr;
+	u32 storage_offset;
 
     Config = XAxiVdma_LookupConfig(4);
     if (!Config) {
@@ -2370,9 +2388,18 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base)
         xil_printf("Read channel config failed, status: 0x%X\r\n", status);
         return status;
     }
+	
+	storage_offset = ReadCfg4.Stride;
+	if(Mode == 0)			// FULL HD
+		Addr = VDMA4_BASE_MEM; // + storage_offset + ((1920 * 180 * 4) + (320 *4));
+	else 					// HD
+		Addr = VDMA4_BASE_MEM + storage_offset + ((1920 * 180 * 4) + (320 *4));
+	ReadCfg4.FrameStoreStartAddr[0] = Addr;
+
 
     /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
-    status = XAxiVdma_DmaSetBufferAddr(&InstancePtr4, XAXIVDMA_WRITE, (UINTPTR *)vdma4_base);
+    // status = XAxiVdma_DmaSetBufferAddr(&InstancePtr4, XAXIVDMA_WRITE, (UINTPTR *)vdma4_base);
+	status = XAxiVdma_DmaSetBufferAddr(&InstancePtr4, XAXIVDMA_WRITE, ReadCfg4.FrameStoreStartAddr);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
         return status;
