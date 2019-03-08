@@ -51,7 +51,7 @@ void initialize(uint32_t *fb_mem)
 {
     xpl_open();
     check_xpl_interface();
-    activate_vdma_0(0, 1920, 1080, fb_mem);
+    // activate_vdma_0(0, 1920, 1080, fb_mem);
 	activate_vdma_1(0, 1920, 1080, fb_mem);
 	// activate_vdma_2(0, 1920, 1080, fb_mem);
 	activate_vdma_3(0, 1920, 1080, fb_mem);
