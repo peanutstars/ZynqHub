@@ -35,18 +35,18 @@ uint32_t XAxiVdma_ReadReg(UINTPTR base, int offset)
     uint32_t regv = 0;
     uint32_t _offset = (uint32_t)base + offset;
     if (reg_read32(_offset, &regv) != IOK) {
-        ERR("READ32(offset:%06X)", _offset);
+        ERR("READ32(offset:%08X)", _offset);
     }
-    DBG("RD32:%06X -> %08X\n", _offset, regv);
+    DBG("RD32:%08X -> %08X\n", _offset, regv);
     return regv;
 }
 
 void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
 {
     uint32_t _offset = (uint32_t)base + offset;
-    DBG("WR32:%06X <- %08X\n", _offset, data);
+    DBG("WR32:%08X <- %08X\n", _offset, data);
     if (reg_write32(_offset, data) != IOK) {
-        ERR("WRITE32(offset:%06X, %08X)", _offset, data);
+        ERR("WRITE32(offset:%08X, %08X)", _offset, data);
     }
 }
 
@@ -2074,6 +2074,8 @@ int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
     int status;
     XAxiVdma_Config *Config;
 
+	xil_printf("VDMA0 Init Start\n");
+	
     Config = XAxiVdma_LookupConfig(0);
     if (!Config) {
         xil_printf("No video DMA0 found\r\n");
@@ -2130,7 +2132,7 @@ int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
         return status;
     }
     /* ************ DMA engine start done *************** */
-
+	xil_printf("VDMA0 Engine Start done\n");
     return XST_SUCCESS;
 }
 
@@ -2139,6 +2141,8 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
     int status;
     XAxiVdma_Config *Config;
 	u32 Addr, storage_offset;
+
+	xil_printf("VDMA1 Init Start\n");
 
     Config = XAxiVdma_LookupConfig(1);
     if (!Config) {
@@ -2203,6 +2207,7 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
     }
     /* ************ DMA engine start done *************** */
 
+	xil_printf("VDMA1 Engine Start done\n");
     return XST_SUCCESS;
 }
 
@@ -2212,6 +2217,8 @@ int activate_vdma_2(int base, int hsize, int vsize, uint32_t *vdma2_base)
     XAxiVdma_Config *Config;
 	u32 Addr;
 	u32 storage_offset;
+
+	xil_printf("VDMA2 Init Start\n");
 
     Config = XAxiVdma_LookupConfig(2);
     if (!Config) {
@@ -2277,6 +2284,7 @@ int activate_vdma_2(int base, int hsize, int vsize, uint32_t *vdma2_base)
     }
     /* ************ DMA engine start done *************** */
 
+	xil_printf("VDMA2 Engine Start done\n");
     return XST_SUCCESS;
 }
 
@@ -2286,6 +2294,7 @@ int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
     int status;
     XAxiVdma_Config *Config;
 
+	xil_printf("VDMA3 Init Start\n");
     Config = XAxiVdma_LookupConfig(3);
     if (!Config) {
         xil_printf("No video DMA3 found\r\n");
@@ -2342,7 +2351,7 @@ int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
         return status;
     }
     /* ************ DMA engine start done *************** */
-
+	xil_printf("VDMA3 Engine Start done\n");
     return XST_SUCCESS;
 }
 
@@ -2354,6 +2363,7 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mo
 	u32 Addr;
 	u32 storage_offset;
 
+	xil_printf("VDMA4 Init Start\n");
     Config = XAxiVdma_LookupConfig(4);
     if (!Config) {
         xil_printf("No video DMA4 found\r\n");
@@ -2419,6 +2429,7 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mo
         return status;
     }
     /* ************ DMA engine start done *************** */
-
+	
+	xil_printf("VDMA4 Engine Start done\n");
     return XST_SUCCESS;
 }
