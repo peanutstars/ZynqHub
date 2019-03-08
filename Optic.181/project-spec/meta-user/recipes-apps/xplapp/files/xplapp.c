@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     uint32_t *fb_mem = &_fb_mem;
     uint32_t addr;
 
-	printf("VDMA & FB Test Program - Optilogic 2019. 3. 1 a\n");
+	printf("VDMA & FB Test Program - Optilogic 2019. 3. 1 c\n");
     if (argc >= 2) {
         addr = strtoul(argv[1], NULL, 0);
         fb_mem = &addr;
