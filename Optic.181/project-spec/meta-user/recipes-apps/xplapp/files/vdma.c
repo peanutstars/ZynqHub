@@ -2301,7 +2301,7 @@ int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
         return XST_FAILURE;
     }
 
-    status = XAxiVdma_CfgInitialize(&InstancePtr3, Config, Config->BaseAddress);
+    status = XAxiVdma_CfgInitialize(&InstancePtr3, Config, Config->BaseAddress + 0x83000000);
     if (status != XST_SUCCESS) {
         xil_printf("Configuration Initialization failed, status: 0x%X\r\n", status);
         return status;
