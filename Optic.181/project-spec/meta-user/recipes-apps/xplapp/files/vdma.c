@@ -2069,6 +2069,127 @@ void XAxiVdma_DmaRegisterDump(XAxiVdma *InstancePtr, u16 Direction)
     return;
 }
 
+void VDMA_Config_Dump(XAxiVdma_Config *ptr)
+{
+	xil_printf("---------------------------------------------\r\n");
+	xil_printf("Base Address = %x\r\n", ptr->BaseAddress);
+	xil_printf("Max Frame Store Num = %d\r\n", ptr->HasMm2S);
+	xil_printf("HasMm2S = %d\r\n", ptr->HasMm2S);
+	xil_printf("HasMm2SDRE = %d\r\n", ptr->HasMm2SDRE);
+	xil_printf("Mm2SWordLen = %d\r\n", ptr->Mm2SWordLen);
+	xil_printf("HasS2Mm = %d\r\n", ptr->HasS2Mm);
+	xil_printf("HasS2MmDRE = %d\r\n", ptr->HasS2MmDRE);
+	xil_printf("S2MmWordLen = %d\r\n", ptr->S2MmWordLen);
+	xil_printf("HasSG = %d\r\n", ptr->HasSG);
+	xil_printf("EnableVIDParamRead = %d\r\n", ptr->EnableVIDParamRead);
+	xil_printf("UseFsync = %d\r\n", ptr->UseFsync);
+	xil_printf("FlushonFsync = %d\r\n", ptr->FlushonFsync);
+	xil_printf("Mm2SBufDepth = %d\r\n", ptr->Mm2SBufDepth);
+	xil_printf("S2MmBufDepth = %d\r\n", ptr->S2MmBufDepth);
+	xil_printf("Mm2SGenLock = %d\r\n", ptr->Mm2SGenLock);
+	xil_printf("S2MmGenLock = %d\r\n", ptr->S2MmGenLock);
+	xil_printf("InternalGenLock = %d\r\n", ptr->InternalGenLock);
+	xil_printf("S2MmSOF = %d\r\n", ptr->S2MmSOF);
+	xil_printf("Mm2SStreamWidth = %d\r\n", ptr->Mm2SStreamWidth);
+	xil_printf("S2MmStreamWidth = %d\r\n", ptr->S2MmStreamWidth);
+	xil_printf("Mm2SThresRegEn = %d\r\n", ptr->Mm2SThresRegEn);
+	xil_printf("Mm2SFrmStoreRegEn = %d\r\n", ptr->Mm2SFrmStoreRegEn);
+	xil_printf("Mm2SDlyCntrEn = %d\r\n", ptr->Mm2SDlyCntrEn);
+	xil_printf("Mm2SFrmCntrEn = %d\r\n", ptr->Mm2SFrmCntrEn);
+	xil_printf("S2MmThresRegEn = %d\r\n", ptr->S2MmThresRegEn);
+	xil_printf("S2MmFrmStoreRegEn = %d\r\n", ptr->S2MmFrmStoreRegEn);
+	xil_printf("S2MmDlyCntrEn = %d\r\n", ptr->S2MmDlyCntrEn);
+	xil_printf("S2MmFrmCntrEn = %d\r\n", ptr->S2MmFrmCntrEn);
+	xil_printf("EnableAllDbgFeatures = %d\r\n", ptr->EnableAllDbgFeatures);
+	xil_printf("AddrWidth = %d\r\n", ptr->AddrWidth);
+	xil_printf("---------------------------------------------\r\n");
+}
+//--------------------------------------------------------------------------
+void VDMA_Setup_Dump(XAxiVdma_DmaSetup *ptr)
+{
+	int i;
+
+	xil_printf("---------------------------------------------\r\n");
+	xil_printf("VertSizeInput = %d\r\n", ptr->VertSizeInput);
+	xil_printf("HoriSizeInput = %d\r\n", ptr->HoriSizeInput);
+	xil_printf("Stride = %d\r\n", ptr->Stride);
+	xil_printf("FrameDelay = %d\r\n", ptr->FrameDelay);
+	xil_printf("EnableCircularBuf = %d\r\n", ptr->EnableCircularBuf);
+	xil_printf("EnableSync = %d\r\n", ptr->EnableSync);
+	xil_printf("PointNum = %d\r\n", ptr->PointNum);
+	xil_printf("EnableFrameCounter = %d\r\n", ptr->EnableFrameCounter);
+	xil_printf("FixedFrameStoreAddr = %d\r\n", ptr->FixedFrameStoreAddr);
+	xil_printf("GenLockRepeat = %d\r\n", ptr->GenLockRepeat);
+
+	for(i = 0; i < XAXIVDMA_MAX_FRAMESTORE; i ++)
+	{
+		xil_printf("%d FrameStoreStartAddr = %x\r\n", i, ptr->FrameStoreStartAddr[i]);
+	}
+	xil_printf("---------------------------------------------\r\n");
+}
+//--------------------------------------------------------------------------
+void VDMA_Check_Errors(u32 addr)
+{
+	u32 *ptr;
+
+	u32 outErrors;
+
+	ptr = (volatile u32 *)(addr + XAXIVDMA_TX_OFFSET + XAXIVDMA_SR_OFFSET);
+
+	outErrors = *ptr & 0x000046F0;
+
+	xil_printf("========== %x =============\r\n", addr);
+	if ( outErrors & 0x00004000 )
+	{
+		xil_printf( "\tMM2S_DMASR - ErrIrq\n\r" );
+	}
+	if ( outErrors & 0x00000400 )
+	{
+		xil_printf( "\tMM2S_DMASR - SGDecErr\n\r" );
+	}
+	if ( outErrors & 0x00000200 )
+	{
+		xil_printf( "\tMM2S_DMASR - SGSlvErr\n\r" );
+	}
+	if ( outErrors & 0x00000080 )
+	{
+		xil_printf( "\tMM2S_DMASR - SOFEarlyErr\n\r" );
+	}
+	if ( outErrors & 0x00000040 )
+	{
+		xil_printf( "\tMM2S_DMASR - DMADecErr\n\r" );
+	}
+	if ( outErrors & 0x00000020 )
+	{
+		xil_printf( "\tMM2S_DMASR - DMASlvErr\n\r" );
+	}
+	if ( outErrors & 0x00000010 )
+	{
+		xil_printf( "\tMM2S_DMASR - DMAIntErr\n\r" );
+	}
+	if (( outErrors & 0x00000000 ) == 0)
+		xil_printf("No Error\r\n");
+	else
+		xil_printf("Error\r\n");
+	xil_printf("=======================\r\n");
+}
+//--------------------------------------------------------------------------
+void VDMA_Control_Dump(u32 addr)
+{
+	u32 *ptr;
+	u32 i;
+
+	ptr = (u32 *)(addr);
+
+	xil_printf("---------------------------------------------\r\n");
+	for(i = 0; i < 0xFF; i += 4)
+	{
+		xil_printf("%x Address = %x\r\n", addr + i, *ptr);
+		ptr++;
+	}
+	xil_printf("---------------------------------------------\r\n");
+}
+
 int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
 {
     int status;
@@ -2148,13 +2269,19 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
     if (!Config) {
         xil_printf("No video DMA1 found\r\n");
         return XST_FAILURE;
-    }
+    }else
+	{
+		xil_printf("Video DMA1 config address = %x\n", Config->BaseAddress);
+	}
 
     status = XAxiVdma_CfgInitialize(&InstancePtr1, Config, Config->BaseAddress);
     if (status != XST_SUCCESS) {
         xil_printf("Configuration Initialization failed, status: 0x%X\r\n", status);
         return status;
-    }
+    }else
+	{
+		xil_printf("");
+	}
 
     u32 stride = hsize * (Config->Mm2SStreamWidth>>3);
 //  printf("hsize: %d  Width: %d\n", hsize, Config->Mm2SStreamWidth);
@@ -2206,6 +2333,9 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
         return status;
     }
     /* ************ DMA engine start done *************** */
+	VDMA_Config_Dump(Config);
+	VDMA_Setup_Dump(&ReadCfg1);
+	VDMA_Control_Dump(0x83010000);
 
 	xil_printf("VDMA1 Engine Start done\n");
     return XST_SUCCESS;
