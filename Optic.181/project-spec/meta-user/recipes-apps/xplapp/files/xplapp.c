@@ -57,8 +57,8 @@ void initialize(uint32_t *fb_mem)
     // activate_vdma_0(0, 1920, 1080, fb_mem);
 	activate_vdma_1(0, 1920, 1080, fb_mem);
 	// activate_vdma_2(0, 1920, 1080, fb_mem);
-	 activate_vdma_3(0, 1920, 1080, fb_mem);
-	  activate_vdma_4(0, 1920, 1080, fb_mem, 0);
+	activate_vdma_3(0, 1920, 1080, fb_mem);
+	activate_vdma_4(0, 1920, 1080, fb_mem, 0);
 }
 
 void finalize(void)
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     uint32_t *fb_mem = &_fb_mem;
     uint32_t addr;
 
-	printf("VDMA & FB Test Program - Optilogic 2019. 3. 1 d\n");
+	printf("VDMA & FB Test Program - Optilogic %s %s\n", __DATE__, __TIME__);
     if (argc >= 2) {
         addr = strtoul(argv[1], NULL, 0);
         fb_mem = &addr;

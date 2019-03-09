@@ -8,10 +8,9 @@ echo 0 > /sys/class/graphics/fbcon/cursor_blink
 ifconfig eth0 192.168.1.200
 insmod $MODULE_PATH/xpldrv.ko
 insmod $MODULE_PATH/olfb.ko videocount=8
-zcat /home/root/argb/screen4.png.argb.gz | dd of=/dev/fb0 2>&1 1>$VERBOSE
-zcat /home/root/argb/screen1.png.argb.gz | dd of=/dev/fb1 2>&1 1>$VERBOSE
-zcat /home/root/argb/screen2.png.argb.gz | dd of=/dev/fb2 2>&1 1>$VERBOSE
-zcat /home/root/argb/screen3.png.argb.gz | dd of=/dev/fb3 2>&1 1>$VERBOSE
 gpio.py out 54 1 >$VERBOSE
 xplinit > $VERBOSE
-
+zcat /home/root/argb/screen1.png.argb.gz | dd of=/dev/fb0 2>&1 1>$VERBOSE
+zcat /home/root/argb/screen2.png.argb.gz | dd of=/dev/fb1 2>&1 1>$VERBOSE
+zcat /home/root/argb/screen3.png.argb.gz | dd of=/dev/fb2 2>&1 1>$VERBOSE
+zcat /home/root/argb/screen4.png.argb.gz | dd of=/dev/fb3 2>&1 1>$VERBOSE

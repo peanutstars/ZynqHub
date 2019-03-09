@@ -25,7 +25,8 @@ class ConvertPicture:
                     argb.append(v[2])  # B
                     argb.append(v[1])  # G
                     argb.append(v[0])  # R
-                    argb.append(v[3])
+                    # argb.append(v[3])
+                    argb.append(0x64)
                 f.write(argb)
 
 

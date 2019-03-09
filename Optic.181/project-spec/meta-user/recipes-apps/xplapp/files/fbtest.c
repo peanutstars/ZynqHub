@@ -185,19 +185,19 @@ int main( int argc, char* argv[] )
                         framebuffer_pointer[pixel_offset]=cfg.order[0][0];//B  
                         framebuffer_pointer[pixel_offset+1]=cfg.order[0][1];//G  
                         framebuffer_pointer[pixel_offset+2]=cfg.order[0][2];//R  
-                        framebuffer_pointer[pixel_offset+3]=0;//A  
+                        framebuffer_pointer[pixel_offset+3]=64;//A  
                     }  
                     if ( x>width*1/3 && x<=width*2/3){      
                         framebuffer_pointer[pixel_offset]=cfg.order[1][0];//B  
                         framebuffer_pointer[pixel_offset+1]=cfg.order[1][1];//G  
                         framebuffer_pointer[pixel_offset+2]=cfg.order[1][2];//R  
-                        framebuffer_pointer[pixel_offset+3]=0;//A  
+                        framebuffer_pointer[pixel_offset+3]=64;//A  
                     }  
                     if ( x>width*2/3){     
                         framebuffer_pointer[pixel_offset]=cfg.order[2][0];//B  
                         framebuffer_pointer[pixel_offset+1]=cfg.order[2][1];//G  
                         framebuffer_pointer[pixel_offset+2]=cfg.order[2][2];//R  
-                        framebuffer_pointer[pixel_offset+3]=0;//A  
+                        framebuffer_pointer[pixel_offset+3]=64;//A  
                     }  
                 }  
 

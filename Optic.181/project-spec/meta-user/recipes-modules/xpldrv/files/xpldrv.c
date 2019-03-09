@@ -33,7 +33,7 @@ MODULE_AUTHOR("HSLee");
 
 #if USE_XPL_PERI_BASE_ADDR
 static unsigned long xpl_peri_base_addr     = 0x83000000;
-static int xpl_peri_size                    = 0x00010000;
+static int xpl_peri_size                    = 0x00050000;
 static void* xpl_peri_base                  = NULL;
 #endif 
 #if USE_XPL_DDR_BASE_ADDR

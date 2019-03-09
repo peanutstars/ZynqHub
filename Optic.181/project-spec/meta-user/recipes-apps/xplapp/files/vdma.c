@@ -1299,8 +1299,8 @@ static u32 XAxiVdma_BdRead(XAxiVdma_Bd *BdPtr, int Offset)
  *****************************************************************************/
 static void XAxiVdma_BdWrite(XAxiVdma_Bd *BdPtr, int Offset, u32 Value)
 {
-    DBG("%s: WR %08X <- %08X\n", __FUNCTION__, (uint32_t)BdPtr+Offset, Value);
-    *(u32 *)((UINTPTR)(void *)BdPtr + Offset) = Value;
+    // DBG("%s: WR %08X <- %08X\n", __FUNCTION__, (uint32_t)BdPtr+Offset, Value);
+    // *(u32 *)((UINTPTR)(void *)BdPtr + Offset) = Value;
 
     return;
 }
@@ -2178,7 +2178,7 @@ void VDMA_Control_Dump(u32 addr)
 {
 	u32 *ptr;
 	u32 i;
-
+/*
 	ptr = (u32 *)(addr);
 
 	xil_printf("---------------------------------------------\r\n");
@@ -2188,6 +2188,7 @@ void VDMA_Control_Dump(u32 addr)
 		ptr++;
 	}
 	xil_printf("---------------------------------------------\r\n");
+*/
 }
 
 int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
@@ -2196,7 +2197,7 @@ int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
     XAxiVdma_Config *Config;
 
 	xil_printf("VDMA0 Init Start\n");
-	
+
     Config = XAxiVdma_LookupConfig(0);
     if (!Config) {
         xil_printf("No video DMA0 found\r\n");
@@ -2386,7 +2387,7 @@ int activate_vdma_2(int base, int hsize, int vsize, uint32_t *vdma2_base)
     }
 
 	storage_offset = ReadCfg2.Stride;
-	Addr = VDMA2_BASE_MEM + storage_offset;
+	Addr = VDMA2_BASE_MEM; // + storage_offset;
 
 	ReadCfg2.FrameStoreStartAddr[0] = Addr;
 
@@ -2429,9 +2430,12 @@ int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
     if (!Config) {
         xil_printf("No video DMA3 found\r\n");
         return XST_FAILURE;
-    }
+    }else
+	{
+		xil_printf("Video DMA3 fount\n", Config->BaseAddress);
+	}
 
-    status = XAxiVdma_CfgInitialize(&InstancePtr3, Config, Config->BaseAddress + 0x83000000);
+    status = XAxiVdma_CfgInitialize(&InstancePtr3, Config, Config->BaseAddress);
     if (status != XST_SUCCESS) {
         xil_printf("Configuration Initialization failed, status: 0x%X\r\n", status);
         return status;
@@ -2482,6 +2486,9 @@ int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
     }
     /* ************ DMA engine start done *************** */
 	xil_printf("VDMA3 Engine Start done\n");
+	VDMA_Config_Dump(Config);
+	VDMA_Setup_Dump(&ReadCfg3);
+	VDMA_Control_Dump(0x83030000);
     return XST_SUCCESS;
 }
 
@@ -2528,7 +2535,7 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mo
         xil_printf("Read channel config failed, status: 0x%X\r\n", status);
         return status;
     }
-	
+
 	storage_offset = ReadCfg4.Stride;
 	if(Mode == 0)			// FULL HD
 		Addr = VDMA4_BASE_MEM; // + storage_offset + ((1920 * 180 * 4) + (320 *4));
@@ -2559,7 +2566,7 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mo
         return status;
     }
     /* ************ DMA engine start done *************** */
-	
+
 	xil_printf("VDMA4 Engine Start done\n");
     return XST_SUCCESS;
 }
