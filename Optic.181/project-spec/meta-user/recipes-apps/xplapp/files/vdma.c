@@ -2514,8 +2514,10 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mo
     if (status != XST_SUCCESS) {
         xil_printf("Configuration Initialization failed, status: 0x%X\r\n", status);
         return status;
-    }
-
+    }else 
+	{
+		xil_printf("Configuration Initialization ok\n");
+	}
     u32 stride = hsize * (Config->Mm2SStreamWidth>>3);
 //  printf("hsize: %d  Width: %d\n", hsize, Config->Mm2SStreamWidth);
 
@@ -2537,7 +2539,10 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mo
     if (status != XST_SUCCESS) {
         xil_printf("Read channel config failed, status: 0x%X\r\n", status);
         return status;
-    }
+    }else
+	{
+		xil_printf("Read channel config\n");
+	}
 
 	storage_offset = ReadCfg4.Stride;
 	if(Mode == 0)			// FULL HD
