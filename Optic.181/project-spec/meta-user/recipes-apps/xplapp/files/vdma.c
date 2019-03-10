@@ -2486,8 +2486,8 @@ int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
     }
     /* ************ DMA engine start done *************** */
 	xil_printf("VDMA3 Engine Start done\n");
-	// VDMA_Config_Dump(Config);
-	// VDMA_Setup_Dump(&ReadCfg3);
+	VDMA_Config_Dump(Config);
+	VDMA_Setup_Dump(&ReadCfg3);
     return XST_SUCCESS;
 }
 
@@ -2575,8 +2575,8 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mo
     }
     /* ************ DMA engine start done *************** */
 
-	// VDMA_Config_Dump(Config);
-	// VDMA_Setup_Dump(&ReadCfg4);
+	VDMA_Config_Dump(Config);
+	VDMA_Setup_Dump(&ReadCfg4);
 	xil_printf("VDMA4 Engine Start done  ... \n");
     return XST_SUCCESS;
 }
