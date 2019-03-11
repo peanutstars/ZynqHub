@@ -206,8 +206,8 @@ CONFIG_SUBSYSTEM_DTB_PADDING_SIZE=0x1000
 #
 # Firmware Version Configuration
 #
-CONFIG_SUBSYSTEM_HOSTNAME="Optic-board"
-CONFIG_SUBSYSTEM_PRODUCT="Optic-board"
+CONFIG_SUBSYSTEM_HOSTNAME="twos-board"
+CONFIG_SUBSYSTEM_PRODUCT="Endoscope"
 CONFIG_SUBSYSTEM_FW_VERSION="1.00"
 
 #
@@ -252,4 +252,6 @@ CONFIG_YOCTO_NETWORK_SSTATE_FEEDS_URL="http://petalinux.xilinx.com/sswreleases/r
 # User Layers
 #
 CONFIG_USER_LAYER_0=""
+
+
 CONFIG_SUBSYSTEM_BOOTARGS_GENERATED="console=ttyPS0,115200 earlyprintk root=/dev/mmcblk0p2 rw rootwait"
