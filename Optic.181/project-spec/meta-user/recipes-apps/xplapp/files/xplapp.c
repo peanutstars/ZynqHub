@@ -61,8 +61,9 @@ void check_xpl_interface(void);
 void reset_fpga_core(void)
 {
     int fd;
-    size_t vlength = 0x3000;
+    size_t vlength = 0x10000;
     uint32_t *vaddr;
+
 
     fd = open("/dev/mem", O_RDWR | O_SYNC);
     if (fd < 0) {
@@ -76,9 +77,16 @@ void reset_fpga_core(void)
     *(vaddr + 0x2000/4) = 0x00000001;
     *(vaddr + 0x1000/4) = *(vaddr + 0x1000/4) & 0xFFFFFFFE;
     *(vaddr + 0x2000/4) = *(vaddr + 0x2000/4) & 0xFFFFFFFE;
-    
+
+	printf("Clock Frequency = %d\n", *(vaddr + 0x100C/4));
+	printf("Total Pixels    = %d\n", *(vaddr + 0x1010/4));
+	printf("Activ Pixels    = %d\n", *(vaddr + 0x1014/4));
+	printf("Total Lines     = %d\n", *(vaddr + 0x1018/4));
+	printf("Activ Lines     = %d\n", *(vaddr + 0x101C/4));
+
     munmap(vaddr, vlength);
 }
+
 
 void initialize(Config *cfg)
 {
@@ -147,9 +155,8 @@ int options(Config *cfg, int argc, char **argv)
         0x42000000, 0x42800000,
         0x43000000, 0x43800000,
     };
-    
-
-    while ((opt = getopt(argc, argv, "hid:")) != -1) {
+ 
+    while ((opt = getopt(argc, argv, "hidr:")) != -1) {
         switch (opt) {
             case 'h':
                 usage();
