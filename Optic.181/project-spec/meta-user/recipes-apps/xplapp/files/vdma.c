@@ -2193,74 +2193,7 @@ void VDMA_Control_Dump(u32 addr)
 	xil_printf("---------------------------------------------\r\n");
 */
 }
-
-int activate_vdma_0(int base, int hsize, int vsize, uint32_t *fb_mem)
-{
-    int status;
-    XAxiVdma_Config *Config;
-
-	xil_printf("VDMA0 Init Start\n");
-
-    Config = XAxiVdma_LookupConfig(0);
-    if (!Config) {
-        xil_printf("No video DMA0 found\r\n");
-        return XST_FAILURE;
-    }
-
-    status = XAxiVdma_CfgInitialize(&InstancePtr0, Config, Config->BaseAddress);
-    if (status != XST_SUCCESS) {
-        xil_printf("Configuration Initialization failed, status: 0x%X\r\n", status);
-        return status;
-    }
-
-    u32 stride = hsize * (Config->Mm2SStreamWidth>>3);
-//  printf("hsize: %d  Width: %d\n", hsize, Config->Mm2SStreamWidth);
-
-    /* ************************************************** */
-    /*           Setup the read channel                   */
-    /*                                                    */
-    /* ************************************************** */
-    ReadCfg0.VertSizeInput       = vsize;
-    ReadCfg0.HoriSizeInput       = stride;
-    ReadCfg0.Stride              = stride;
-    ReadCfg0.FrameDelay          = 0;      /* This example does not test frame delay */
-    ReadCfg0.EnableCircularBuf   = 1;      /* Only 1 buffer, continuous loop */
-    ReadCfg0.EnableSync          = 0;      /* Gen-Lock */
-    ReadCfg0.PointNum            = 0;
-    ReadCfg0.EnableFrameCounter  = 0;      /* Endless transfers */
-    ReadCfg0.FixedFrameStoreAddr = 0;      /* We are not doing parking */
-
-    status = XAxiVdma_DmaConfig(&InstancePtr0, XAXIVDMA_READ, &ReadCfg0);
-    if (status != XST_SUCCESS) {
-        xil_printf("Read channel config failed, status: 0x%X\r\n", status);
-        return status;
-    }
-
-    /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
-    status = XAxiVdma_DmaSetBufferAddr(&InstancePtr0, XAXIVDMA_READ, (UINTPTR *)fb_mem);
-    if (status != XST_SUCCESS) {
-        xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
-        return status;
-    }
-    /************* Read channel setup done ************** */
-
-    /* ************************************************** */
-    /*  Start the DMA engine (read channel) to transfer   */
-    /*                                                    */
-    /* ************************************************** */
-
-    /* Start the Read channel of DMA Engine */
-    DBG("Start VDMA\n");
-    status = XAxiVdma_DmaStart(&InstancePtr0, XAXIVDMA_READ);
-    if (status != XST_SUCCESS) {
-        xil_printf("Failed to start DMA engine (read channel), status: 0x%X\r\n", status);
-        return status;
-    }
-    /* ************ DMA engine start done *************** */
-	xil_printf("VDMA0 Engine Start done\n");
-    return XST_SUCCESS;
-}
-
+//--------------------------------------------------------------------------
 int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
 {
     int status;
@@ -2310,14 +2243,14 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
         return status;
     }
 
-	storage_offset = ReadCfg1.Stride;
-	Addr = VDMA1_BASE_MEM  + storage_offset;
-	ReadCfg1.FrameStoreStartAddr[0] = Addr;
+	// storage_offset = ReadCfg1.Stride;
+	// Addr = VDMA1_BASE_MEM  + storage_offset;
+	// ReadCfg1.FrameStoreStartAddr[0] = Addr;
 
 
     /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
-    // status = XAxiVdma_DmaSetBufferAddr(&InstancePtr1, XAXIVDMA_READ, (UINTPTR *)vdma1_base);
-	status = XAxiVdma_DmaSetBufferAddr(&InstancePtr1, XAXIVDMA_READ, ReadCfg1.FrameStoreStartAddr);
+    status = XAxiVdma_DmaSetBufferAddr(&InstancePtr1, XAXIVDMA_READ, (UINTPTR *)vdma1_base);
+	// status = XAxiVdma_DmaSetBufferAddr(&InstancePtr1, XAXIVDMA_READ, ReadCfg1.FrameStoreStartAddr);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
         return status;
@@ -2342,85 +2275,7 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
 	xil_printf("VDMA1 Engine Start done\n");
     return XST_SUCCESS;
 }
-
-int activate_vdma_2(int base, int hsize, int vsize, uint32_t *vdma2_base)
-{
-    int status;
-    XAxiVdma_Config *Config;
-	u32 Addr;
-	u32 storage_offset;
-
-	xil_printf("VDMA2 Init Start\n");
-
-    Config = XAxiVdma_LookupConfig(2);
-    if (!Config) {
-        xil_printf("No video DMA2 found\r\n");
-        return XST_FAILURE;
-    }
-
-    status = XAxiVdma_CfgInitialize(&InstancePtr2, Config, Config->BaseAddress);
-    if (status != XST_SUCCESS) {
-        xil_printf("Configuration Initialization failed, status: 0x%X\r\n", status);
-        return status;
-    }
-
-    u32 stride = hsize * (Config->Mm2SStreamWidth>>3);
-//  printf("hsize: %d  Width: %d\n", hsize, Config->Mm2SStreamWidth);
-
-    /* ************************************************** */
-    /*           Setup the read channel                   */
-    /*                                                    */
-    /* ************************************************** */
-    ReadCfg2.VertSizeInput       = vsize;
-    ReadCfg2.HoriSizeInput       = stride;
-    ReadCfg2.Stride              = stride;
-    ReadCfg2.FrameDelay          = 0;      /* This example does not test frame delay */
-    ReadCfg2.EnableCircularBuf   = 1;      /* Only 1 buffer, continuous loop */
-    ReadCfg2.EnableSync          = 0;      /* Gen-Lock */
-    ReadCfg2.PointNum            = 0;
-    ReadCfg2.EnableFrameCounter  = 0;      /* Endless transfers */
-    ReadCfg2.FixedFrameStoreAddr = 0;      /* We are not doing parking */
-
-    status = XAxiVdma_DmaConfig(&InstancePtr2, XAXIVDMA_READ, &ReadCfg2);
-    if (status != XST_SUCCESS) {
-        xil_printf("Read channel config failed, status: 0x%X\r\n", status);
-        return status;
-    }
-
-	storage_offset = ReadCfg2.Stride;
-	Addr = VDMA2_BASE_MEM; // + storage_offset;
-
-	ReadCfg2.FrameStoreStartAddr[0] = Addr;
-
-
-    /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
-   //  status = XAxiVdma_DmaSetBufferAddr(&InstancePtr2, XAXIVDMA_READ, (UINTPTR *)vdma2_base);
-	status = XAxiVdma_DmaSetBufferAddr(&InstancePtr2, XAXIVDMA_READ, ReadCfg2.FrameStoreStartAddr);
-    if (status != XST_SUCCESS) {
-        xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
-        return status;
-    }
-    /************* Read channel setup done ************** */
-
-    /* ************************************************** */
-    /*  Start the DMA engine (read channel) to transfer   */
-    /*                                                    */
-    /* ************************************************** */
-
-    /* Start the Read channel of DMA Engine */
-    DBG("Start VDMA2\n");
-    status = XAxiVdma_DmaStart(&InstancePtr2, XAXIVDMA_READ);
-    if (status != XST_SUCCESS) {
-        xil_printf("Failed to start DMA engine (read channel), status: 0x%X\r\n", status);
-        return status;
-    }
-    /* ************ DMA engine start done *************** */
-
-	xil_printf("VDMA2 Engine Start done\n");
-    return XST_SUCCESS;
-}
-
-
+//--------------------------------------------------------------------------
 int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
 {
     int status;
@@ -2543,17 +2398,17 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mo
 		xil_printf("Read channel config\n");
 	}
 
-	storage_offset = ReadCfg4.Stride;
-	if(Mode == 0)			// FULL HD
-		Addr = VDMA4_BASE_MEM; // + storage_offset + ((1920 * 180 * 4) + (320 *4));
-	else 					// HD
-		Addr = VDMA4_BASE_MEM + storage_offset + ((1920 * 180 * 4) + (320 *4));
-	ReadCfg4.FrameStoreStartAddr[0] = Addr;
+	// storage_offset = ReadCfg4.Stride;
+	// if(Mode == 0)			// FULL HD
+	// 	Addr = VDMA4_BASE_MEM; // + storage_offset + ((1920 * 180 * 4) + (320 *4));
+	// else 					// HD
+	// 	Addr = VDMA4_BASE_MEM + storage_offset + ((1920 * 180 * 4) + (320 *4));
+	// ReadCfg4.FrameStoreStartAddr[0] = Addr;
 
 
     /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
-    // status = XAxiVdma_DmaSetBufferAddr(&InstancePtr4, XAXIVDMA_WRITE, (UINTPTR *)vdma4_base);
-	status = XAxiVdma_DmaSetBufferAddr(&InstancePtr4, XAXIVDMA_WRITE, ReadCfg4.FrameStoreStartAddr);
+    status = XAxiVdma_DmaSetBufferAddr(&InstancePtr4, XAXIVDMA_WRITE, (UINTPTR *)vdma4_base);
+	// status = XAxiVdma_DmaSetBufferAddr(&InstancePtr4, XAXIVDMA_WRITE, ReadCfg4.FrameStoreStartAddr);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
         return status;

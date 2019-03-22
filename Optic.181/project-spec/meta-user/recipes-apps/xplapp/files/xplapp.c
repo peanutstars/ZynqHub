@@ -45,7 +45,9 @@ struct Config {
     int init;
     int reset;
     uint32_t vout_fd;
+	uint32_t cap_fd;
     uint32_t fb_mem;
+	uint32_t fb_mem_cap;
 };
 typedef struct Config Config;
 
@@ -99,11 +101,9 @@ void initialize(Config *cfg)
         reset_fpga_core();
     }
     if (cfg->init) {
-        // activate_vdma_0(0, 1920, 1080, fb_mem);
-    	activate_vdma_1(0, 1920, 1080, &cfg->fb_mem);
-    	// activate_vdma_2(0, 1920, 1080, fb_mem);
+    	activate_vdma_1(0, 1920, 1080, &cfg->fb_mem_cap);
     	activate_vdma_3(0, 1920, 1080, &cfg->fb_mem);
-    	activate_vdma_4(0, 1920, 1080, &cfg->fb_mem, 0);
+    	activate_vdma_4(0, 1920, 1080, &cfg->fb_mem_cap, 0);
     }
     else {
     	activate_vdma_3(0, 1920, 1080, &cfg->fb_mem);
@@ -164,6 +164,7 @@ int options(Config *cfg, int argc, char **argv)
             case 'i':
                 cfg->reset = 1;
                 cfg->init = 1;
+				cfg->cap_fd = 3;
                 break;
             case 'd':
                 cfg->vout_fd = (uint32_t) atoi(optarg);
@@ -180,6 +181,7 @@ int options(Config *cfg, int argc, char **argv)
         usage();
     }
     cfg->fb_mem = _fb_mem[cfg->vout_fd];
+	cfg->fb_mem_cap = _fb_mem[cfg->cap_fd];
 
     fprintf(stderr, "Options, reset:%d init:%d video_out_fd:%d\n", 
             cfg->reset, cfg->init, cfg->vout_fd);

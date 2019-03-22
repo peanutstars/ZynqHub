@@ -4,6 +4,9 @@ KERNEL_INFO=`uname -r`
 MODULE_PATH="/lib/modules/$KERNEL_INFO/extra/"
 VERBOSE="/dev/null"
 
+QT_QWS_FONTDIR=/usr/lib/fonts
+export QT_QWS_FONTDIR
+
 echo 0 > /sys/class/graphics/fbcon/cursor_blink
 ifconfig eth0 192.168.1.200
 insmod $MODULE_PATH/xpldrv.ko

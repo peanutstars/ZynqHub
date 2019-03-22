@@ -16,6 +16,11 @@
         "thor_mmc=run dfu_mmc_info && thordown 0 mmc 0\0"
 
 
+#ifdef CONFIG_BOOTDELAY
+#undef CONFIG_BOOTDELAY
+#endif
+#define CONFIG_BOOTDELAY        0
+
 /*Required for uartless designs */
 #ifndef CONFIG_BAUDRATE
 #define CONFIG_BAUDRATE 115200
