@@ -146,9 +146,11 @@ int main( int argc, char* argv[] )
     }  
 
     printf( "framebuffer Display information\n" );  
-    printf( " %d x %d  %d bpp\n", framebuffer_variable_screeninfo.xres,  
+    printf( " %d x %d  %d bpp(%d : %d)\n", framebuffer_variable_screeninfo.xres,  
             framebuffer_variable_screeninfo.yres,   
-            framebuffer_variable_screeninfo.bits_per_pixel );  
+            framebuffer_variable_screeninfo.bits_per_pixel,
+			framebuffer_variable_screeninfo.xoffset,
+		    framebuffer_variable_screeninfo.yoffset );  
 
 
     int width  = framebuffer_variable_screeninfo.xres;  
@@ -176,18 +178,25 @@ int main( int argc, char* argv[] )
 
 		// clear Overlay Buffer - FB0
         int x,y;  
-        int y_limit = height/2;
+        int y_limit = height;
         for ( y=0; y<y_limit; y++)  
 		{
             for ( x=0; x<width; x++)  
             {  
-                unsigned int pixel_offset = (y+yoffset)*framebuffer_fixed_screeninfo.line_length*2 +(x+xoffset)*bpp;  
+                // unsigned int pixel_offset = (y+yoffset)*framebuffer_fixed_screeninfo.line_length*2 +(x+xoffset)*bpp; 
+				unsigned int pixel_offset = ((width * bpp) * (y + yoffset)) + ((x + xoffset) * bpp);
 				if(bpp == 4)
-				{				
-					framebuffer_pointer[pixel_offset]=0;//B  
-                	framebuffer_pointer[pixel_offset+1]=0;//G  
-                	framebuffer_pointer[pixel_offset+2]=0;//R  
-                	framebuffer_pointer[pixel_offset+3]=128;//A
+				{		
+					if(x < width / 2)
+					{		
+						framebuffer_pointer[pixel_offset]	= 0;//B  
+                		framebuffer_pointer[pixel_offset+1]	= 0;//G  
+                		framebuffer_pointer[pixel_offset+2]	= 0;//R  
+                		framebuffer_pointer[pixel_offset+3]	= 255;//A
+					}else
+					{
+						
+					}
 				}  
             }
 		}  
