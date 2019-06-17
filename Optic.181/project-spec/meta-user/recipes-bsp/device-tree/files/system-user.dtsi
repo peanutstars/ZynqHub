@@ -1,0 +1,43 @@
+/include/ "system-conf.dtsi"
+/ {
+    i2c1 {
+        status = "okay";
+        rtc@51 {
+            /* nxp pcf8563 rtc */
+            compatible = "nxp,pcf8563";
+            reg = <0x51>;
+        };
+    };
+
+/*  # It doesn't work and refer to http://www.wiki.xilinx.com/Zynq+Linux+USB+Device+Driver  
+    usb_phy0: phy0 {
+        compatible = "ulpi-phy";
+        #phy-cells = <0>;
+        reg = <0xe0002000 0x1000>;
+        view-port = <0x170>;
+        drv-vbus;
+    };
+*/
+/*  It works and refer to http://zedboard.com/content/usb-host-microzed-petalinux-20172 */
+    usb_phy0: usb_phy@0 {
+        compatible = "usb-nop-xceiv";
+        #phy-cells = <0>;
+    };
+    usb_phy1: usb_phy@1 {
+        compatible = "usb-nop-xceiv";
+        #phy-cells = <0>;
+    };
+};
+
+&usb0 {
+    status = "okay";
+    dr_mode = "host";
+    usb-phy = <&usb_phy0>;
+};
+
+&usb1 {
+    status = "okay";
+    dr_mode = "host";
+    usb-phy = <&usb_phy1>;
+};
+

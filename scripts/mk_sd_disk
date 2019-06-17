@@ -1,0 +1,82 @@
+#!/bin/bash
+
+export LANG=C
+
+DD_BS=4M
+
+##############################
+info() {
+    echo "[I] $*"
+}
+err() {
+    echo "[E] $*"
+    exit -1
+}
+cmd() {
+    echo "[C] $*"
+    $*
+    if [ "$?" == "0" ]; then
+        echo "PASS"
+    else
+        echo "FAIL"
+        exit -1
+    fi
+}
+
+usage() {
+    echo "  Usage: `basename $0` <disk_file> <image>"
+    echo 
+    exit -1
+}
+##############################
+
+SD_DISK="$1"
+SD_IMAGE="$2"
+[ -z "$SD_DISK" ] && usage
+[ -z "$SD_IMAGE" ] && usage
+if [ "$EUID" -ne 0 ] ; then
+    echo "Please run as 'sudo $0'"
+    exit
+fi
+
+check_sd_disk() {
+    local sd_disk=`basename $SD_DISK`
+    [ "${#sd_disk}" -ne "3" ] && err "Invalid Parameter: $SD_DISK"
+    [ "$sd_disk" == "sda" ] && err "Is it right, $SD_DISK ???"
+    [ ! -e "$SD_DISK" ] && err "Not Exist $SD_DISK."
+    [ ! -e "$SD_IMAGE" ] && err "Not Exist $SD_IMAGE."
+}
+
+umount_disk() {
+    local sd_disk=`basename $SD_DISK`
+    for _disk in `mount | grep $SD_DISK | awk '{ print $1 }'` ; do
+        cmd umount $_disk
+    done
+}
+
+copy_image() {
+    info "It takes a few minutes."
+    cmd dd if=$SD_IMAGE of=$SD_DISK bs=$DD_BS
+}
+
+resize_part2() {
+    info "Resize SD DISK"
+    fdisk $SD_DISK 2>&1 >/dev/null << EOF
+d
+2
+n
+p
+2
+
+
+w
+EOF
+    cmd e2fsck -f ${SD_DISK}2
+    cmd resize2fs ${SD_DISK}2
+}
+
+############################
+check_sd_disk
+umount_disk
+copy_image
+resize_part2

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#source /opt/Xilinx/SDK/2018.1/settings64.sh
+
+pushd $ROOTPATH/images/linux
+
+/opt/Xilinx/SDK/2018.1/bin/program_flash \
+    -f BOOT.BIN \
+    -offset 0 \
+    -fsbl zynq_fsbl.elf \
+    -flash_type qspi_single \
+    -cable type xilinx_tcf url TCP:127.0.0.1:3121
+
+#     -blank_check
+#     -verify \
+
+popd

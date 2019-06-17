@@ -1,3 +1,11 @@
+.*.swp
+*.o
 components/linux-xlnx
 components/u-boot-xlnx
-
+tags
+*.png
+files/fbtest
+files/xplinit
+Optic.181/project-spec/meta-user/recipes-apps/xplapp/files/fbtest
+Optic.181/project-spec/meta-user/recipes-apps/xplapp/files/xplinit
+qt-everywhere-opensource-src*
