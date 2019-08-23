@@ -3,24 +3,76 @@
 #include "xilinx/xiltypes.h"
 #include "xplioctl.h"
 #include "debug.h"
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <linux/fb.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
 
-#define VDMA0_BASE_MEM				0x60000000
-#define VDMA1_BASE_MEM				0x70000000		// PL : Video In / Out
-#define VDMA2_BASE_MEM				0x70000000
-#define VDMA3_BASE_MEM				0x60000000		// PS : REAR Out
-#define VDMA4_BASE_MEM				0x70000000		// PS : REAR Out
 
-static XAxiVdma InstancePtr0;
-static XAxiVdma InstancePtr1;
-static XAxiVdma InstancePtr2;
-static XAxiVdma InstancePtr3;
+#define RVDMA1_BASE_MEM				0x50000000			// Image out(1920*1080)
+#define WVDMA5_BASE_MEM				0x50000000			// Imge In(1536 x 864)
+
+#define WVDMA4_BASE_MEM				0x43000000			// Image In(1920x1080)
+#define RVDMA9_BASE_MEM				0x43000000
+#define RVDMA7_BASE_MEM				0x43000000
+
+#define WVDMA6_BASE_MEM				0x60000000			// Image In(720x480)
+#define RVDMA8_BASE_MEM				0x60000000
+
+XAxiVdma rInstancePtr1;
+XAxiVdma rInstancePtr3;
+XAxiVdma wInstancePtr4;
+XAxiVdma wInstancePtr5;
+XAxiVdma wInstancePtr6;
+XAxiVdma rInstancePtr7;
+XAxiVdma rInstancePtr8;
+XAxiVdma rInstancePtr9;
+
 static XAxiVdma InstancePtr4;
-
-static XAxiVdma_DmaSetup ReadCfg0;
-static XAxiVdma_DmaSetup ReadCfg1;
-static XAxiVdma_DmaSetup ReadCfg2;
-static XAxiVdma_DmaSetup ReadCfg3;
 static XAxiVdma_DmaSetup ReadCfg4;
+
+XAxiVdma_DmaSetup rReadCfg1;
+XAxiVdma_DmaSetup rReadCfg3;
+XAxiVdma_DmaSetup wReadCfg4;
+XAxiVdma_DmaSetup wReadCfg5;
+XAxiVdma_DmaSetup wReadCfg6;
+XAxiVdma_DmaSetup rReadCfg7;
+XAxiVdma_DmaSetup rReadCfg8;
+XAxiVdma_DmaSetup rReadCfg9;
+
+#define VDMA1_FRAME_DEVICE_ID		0
+#define VDMA3_FRAME_DEVICE_ID		2
+#define VDMA4_FRAME_DEVICE_ID		1
+#define VDMA5_FRAME_DEVICE_ID		3
+#define VDMA6_FRAME_DEVICE_ID		4
+#define VDMA7_FRAME_DEVICE_ID		5
+#define VDMA8_FRAME_DEVICE_ID		6
+#define VDMA9_FRAME_DEVICE_ID		7
+
+uint32_t rfb1_mem;
+uint32_t wfb4_mem;
+uint32_t wfb5_mem;
+uint32_t wfb6_mem;
+uint32_t rfb7_mem;
+uint32_t rfb8_mem;
+uint32_t rfb9_mem;
+
+#define XVTC1_DEVICE_ID				0
+#define XVTC2_DEVICE_ID				1
+#define XVTC5_DEVICE_ID				3
+#define XVTC4_DEVICE_ID				2
+
+uint32_t vtc1_mem;
+uint32_t vtc2_mem;
+uint32_t vtc5_mem;
+uint32_t vtc4_mem;
+
+
+#define SCALER1_DEVICE_ID			0
+#define SCALER2_DEVICE_ID			1
+
 
 static void XAxiVdma_BdSetNextPtr(XAxiVdma_Bd *BdPtr, u32 NextPtr);
 static void XAxiVdma_BdWrite(XAxiVdma_Bd *BdPtr, int Offset, u32 Value);
@@ -30,85 +82,146 @@ static int XAxiVdma_BdSetStride(XAxiVdma_Bd *BdPtr, int Stride);
 static int XAxiVdma_BdSetFrmDly(XAxiVdma_Bd *BdPtr, int FrmDly);
 static void XAxiVdma_BdSetAddr(XAxiVdma_Bd *BdPtr, u32 Addr);
 
+
+static uint32_t *vdmaAddr;
+static int      vdmafd;
+static size_t vdmalength = 0x100000;
+static uint32_t vdma_orgBase;
+
+static uint32_t *vtcAddr;
+static int      vtcfd;
+static size_t vtclength = 0x100000;
+
+//--------------------------------------------------------------------------------------------------------------
+void Vdma_Open(uint32_t addr)
+{
+	vdmafd = open("/dev/mem", O_RDWR | O_SYNC);
+  	if (vdmafd < 0) {
+      	fprintf(stderr, "%s", strerror(errno));
+  	}
+
+  	vdmaAddr = mmap(NULL, vdmalength, PROT_READ | PROT_WRITE, MAP_SHARED, vdmafd, addr);
+
+  	// memset(vdmaAddr, 0x00, vdmalength / 4);
+
+  	xil_printf("[VDMA OK] : VDMA Open %x\n", vdmafd);
+}
+//--------------------------------------------------------------------------------------------------------------
+void Vdma_Close()
+{
+  	munmap(vdmaAddr, vdmalength);
+  	close(vdmafd);
+  	xil_printf("[VDMA OK] : VDMA close\n");
+}
+//--------------------------------------------------------------------------------------------------------------
+void Vtc_Open(uint32_t addr)
+{
+	vtcfd = open("/dev/mem", O_RDWR | O_SYNC);
+  	if (vtcfd < 0) {
+      	fprintf(stderr, "%s", strerror(errno));
+  	}
+
+  	vtcAddr = mmap(NULL, vtclength, PROT_READ | PROT_WRITE, MAP_SHARED, vtcfd, addr);
+  	// memset(vtcAddr, 0x00, vtclength / 4);
+  	xil_printf("[VDMA OK] : VTC Open %x\n", vdmafd);
+}
+//--------------------------------------------------------------------------------------------------------------
+void Vtc_Close()
+{
+  	munmap(vtcAddr, vtclength);
+  	close(vtcfd);
+  	xil_printf("[VTC OK] : VTC close\n");
+}
+//--------------------------------------------------------------------------------------------------------------
 uint32_t XAxiVdma_ReadReg(UINTPTR base, int offset)
 {
+	/*
     uint32_t regv = 0;
     uint32_t _offset = (uint32_t)base + offset;
     if (reg_read32(_offset, &regv) != IOK) {
         ERR("READ32(offset:%08X)", _offset);
     }
     DBG("RD32:%08X -> %08X\n", _offset, regv);
+    return regv;*/
+
+    uint32_t regv = 0;
+
+    uint32_t _offset = (uint32_t)vdmaAddr + (((unsigned int)(base - vdma_orgBase)/4) + (offset/4));
+
+    regv  = *(vdmaAddr + ((unsigned int)(base-vdma_orgBase)/4) + ((unsigned int)offset/4) );
+    // DBG("RD32:%08X -> %08X\n", _offset, regv);
     return regv;
 }
-
+//--------------------------------------------------------------------------------------------------------------
 void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
 {
+	/*
     uint32_t _offset = (uint32_t)base + offset;
     DBG("WR32:%08X <- %08X\n", _offset, data);
     if (reg_write32(_offset, data) != IOK) {
         ERR("WRITE32(offset:%08X, %08X)", _offset, data);
+    }*/
+
+    uint32_t _offset = 0;
+    _offset = (uint32_t)vdmaAddr + (((unsigned int)(base - vdma_orgBase)/4) + (offset/4));
+
+    *(vdmaAddr + ((unsigned int)(base-vdma_orgBase)/4) + ((unsigned int )offset/4)) = data;
+    // DBG("WR32:%08X <- %08X(%08X:%08X)\n", _offset, data, base, offset);
+}
+//--------------------------------------------------------------------------------------------------------------
+uint32_t XVtc_ReadReg(UINTPTR base, int offset)
+{
+	/*
+    uint32_t regv = 0;
+    uint32_t _offset = (uint32_t)base + offset;
+    if (reg_read32(_offset, &regv) != IOK) {
+        ERR("READ32(offset:%08X)", _offset);
     }
+    DBG("RD32:%08X -> %08X\n", _offset, regv);
+    return regv;*/
+
+    uint32_t regv = 0;
+
+    uint32_t _offset = (uint32_t)vtcAddr + (offset/4);
+    regv  = *(vtcAddr + ((unsigned int)offset/4));
+
+    // DBG("VTC RD32:%08X -> %08X\n", _offset, regv);
+    return regv;
+}
+//--------------------------------------------------------------------------------------------------------------
+void XVtc_WriteReg(UINTPTR base, int offset, uint32_t data)
+{
+	/*
+    uint32_t _offset = (uint32_t)base + offset;
+    DBG("WR32:%08X <- %08X\n", _offset, data);
+    if (reg_write32(_offset, data) != IOK) {
+        ERR("WRITE32(offset:%08X, %08X)", _offset, data);
+    }*/
+
+    uint32_t _offset = 0;
+    _offset = (uint32_t)vtcAddr + (offset/4);
+
+    *(vtcAddr + ((unsigned int )offset/4)) = data;
+
+    // DBG("VTC WR32:%08X <- %08X\n", _offset, data);
 }
 
-/*****************************************************************************/
-/*
- * Translate virtual address to physical address
- *
- * When port this driver to other RTOS, please change this definition to
- * be consistent with your target system.
- *
- * @param VirtAddr is the virtual address to work on
- *
- * @return
- *   The physical address of the virtual address
- *
- * @note
- *   The virtual address and the physical address are the same here.
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 #define XAXIVDMA_VIRT_TO_PHYS(VirtAddr) \
     (VirtAddr)
-
-/*****************************************************************************/
-/**
- * Set the channel to enable access to higher Frame Buffer Addresses (SG=0)
- *
- * @param Channel is the pointer to the channel to work on
- *
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 #define XAxiVdma_ChannelHiFrmAddrEnable(Channel) \
 { \
     XAxiVdma_WriteReg(Channel->ChanBase, \
             XAXIVDMA_HI_FRMBUF_OFFSET, XAXIVDMA_REGINDEX_MASK); \
 }
-
-/*****************************************************************************/
-/**
- * Set the channel to disable access higher Frame Buffer Addresses (SG=0)
- *
- * @param Channel is the pointer to the channel to work on
- *
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 #define XAxiVdma_ChannelHiFrmAddrDisable(Channel) \
 { \
     XAxiVdma_WriteReg(Channel->ChanBase, \
         XAXIVDMA_HI_FRMBUF_OFFSET, (XAXIVDMA_REGINDEX_MASK >> 1)); \
 }
-
-/*****************************************************************************/
-/**
- * Initialize a channel of a DMA engine
- *
- * This function initializes the BD ring for this channel
- *
- * @param Channel is the pointer to the DMA channel to work on
- *
- * @return
- *   None
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
  void XAxiVdma_ChannelInit(XAxiVdma_Channel *Channel)
  {
      int i;
@@ -116,9 +229,7 @@ void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
      XAxiVdma_Bd *FirstBdPtr = &(Channel->BDs[0]);
      XAxiVdma_Bd *LastBdPtr;
 
-     /* Initialize the BD variables, so proper memory management
-      * can be done
-      */
+     // Initialize the BD variables, so proper memory management can be done
      NumFrames = Channel->NumFrames;
      Channel->IsValid = 0;
      Channel->HeadBdPhysAddr = 0;
@@ -128,8 +239,7 @@ void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
 
      LastBdPtr = &(Channel->BDs[NumFrames - 1]);
 
-     /* Setup the BD ring
-      */
+     // Setup the BD ring
      memset((void *)FirstBdPtr, 0, NumFrames * sizeof(XAxiVdma_Bd));
 
      for (i = 0; i < NumFrames; i++) {
@@ -138,8 +248,7 @@ void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
 
          BdPtr = &(Channel->BDs[i]);
 
-         /* The last BD connects to the first BD
-          */
+         // The last BD connects to the first BD
          if (i == (NumFrames - 1)) {
              NextBdPtr = FirstBdPtr;
          }
@@ -153,9 +262,7 @@ void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
 
      Channel->AllCnt = NumFrames;
 
-     /* Setup the BD addresses so that access the head/tail BDs fast
-      *
-      */
+     // Setup the BD addresses so that access the head/tail BDs fast
      Channel->HeadBdAddr = (UINTPTR)FirstBdPtr;
      Channel->HeadBdPhysAddr = XAXIVDMA_VIRT_TO_PHYS((UINTPTR)FirstBdPtr);
 
@@ -167,58 +274,25 @@ void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
 
      return;
  }
- /*****************************************************************************/
- /**
-  * This function checks whether reset operation is done
-  *
-  * @param Channel is the pointer to the DMA channel to work on
-  *
-  * @return
-  * - 0 if reset is done
-  * - 1 if reset is still going
-  *
-  *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
  int XAxiVdma_ChannelResetNotDone(XAxiVdma_Channel *Channel)
  {
      return (XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET) &
              XAXIVDMA_CR_RESET_MASK);
  }
- /*****************************************************************************/
- /**
-  * This function resets one DMA channel
-  *
-  * The registers will be default values after the reset
-  *
-  * @param Channel is the pointer to the DMA channel to work on
-  *
-  * @return
-  *  None
-  *
-  *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
  void XAxiVdma_ChannelReset(XAxiVdma_Channel *Channel)
  {
-     XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
-         XAXIVDMA_CR_RESET_MASK);
+     XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET, XAXIVDMA_CR_RESET_MASK);
 
      return;
  }
- /*****************************************************************************/
- /*
-  * Check whether a DMA channel is running
-  *
-  * @param Channel is the pointer to the channel to work on
-  *
-  * @return
-  * - non zero if the channel is running
-  * - 0 is the channel is idle
-  *
-  *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
  int XAxiVdma_ChannelIsRunning(XAxiVdma_Channel *Channel)
  {
      u32 Bits;
 
-     /* If halted bit set, channel is not running
-      */
+     // If halted bit set, channel is not running
      Bits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_SR_OFFSET) &
                XAXIVDMA_SR_HALTED_MASK;
 
@@ -226,8 +300,7 @@ void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
          return 0;
      }
 
-     /* If Run/Stop bit low, then channel is not running
-      */
+     // If Run/Stop bit low, then channel is not running
      Bits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET) &
                XAXIVDMA_CR_RUNSTOP_MASK;
 
@@ -237,23 +310,12 @@ void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
 
      return 1;
  }
- /*****************************************************************************/
- /**
-  * Check whether a DMA channel is busy
-  *
-  * @param Channel is the pointer to the channel to work on
-  *
-  * @return
-  * - non zero if the channel is busy
-  * - 0 is the channel is idle
-  *
-  *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
  int XAxiVdma_ChannelIsBusy(XAxiVdma_Channel *Channel)
  {
      u32 Bits;
 
-     /* If the channel is idle, then it is not busy
-      */
+     // If the channel is idle, then it is not busy
      Bits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_SR_OFFSET) &
                XAXIVDMA_SR_IDLE_MASK;
 
@@ -261,8 +323,7 @@ void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
          return 0;
      }
 
-     /* If the channel is halted, then it is not busy
-      */
+     // If the channel is halted, then it is not busy
      Bits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_SR_OFFSET) &
                XAXIVDMA_SR_HALTED_MASK;
 
@@ -270,288 +331,10 @@ void XAxiVdma_WriteReg(UINTPTR base, int offset, uint32_t data)
          return 0;
      }
 
-     /* Otherwise, it is busy
-      */
+     // Otherwise, it is busy
      return 1;
  }
-
-//  /*****************************************************************************/
-//  /*
-//   * Check DMA channel errors
-//   *
-//   * @param Channel is the pointer to the channel to work on
-//   *
-//   * @return
-//   *      Error bits of the channel, 0 means no errors
-//   *
-//   *****************************************************************************/
-//  u32 XAxiVdma_ChannelErrors(XAxiVdma_Channel *Channel)
-//  {
-//      return (XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_SR_OFFSET)
-//              & XAXIVDMA_SR_ERR_ALL_MASK);
-//  }
-//  /*****************************************************************************/
-//  /*
-//   * Clear DMA channel errors
-//   *
-//   * @param Channel is the pointer to the channel to work on
-//   * @param ErrorMask is the mask of error bits to clear.
-//   *
-//   * @return
-//   *      None
-//   *
-//   *****************************************************************************/
-//  void XAxiVdma_ClearChannelErrors(XAxiVdma_Channel *Channel, u32 ErrorMask)
-//  {
-//      u32 SrBits;
-//
-//      /* Write on Clear bits */
-//          SrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_SR_OFFSET)
-//                          | ErrorMask;
-//
-//      XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_SR_OFFSET,
-//          SrBits);
-//
-//      return;
-//  }
-//
-//  /*****************************************************************************/
-//  /**
-//   * Get the current status of a channel
-//   *
-//   * @param Channel is the pointer to the channel to work on
-//   *
-//   * @return
-//   * The status of the channel
-//   *
-//   *****************************************************************************/
-//  u32 XAxiVdma_ChannelGetStatus(XAxiVdma_Channel *Channel)
-//  {
-//      return XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_SR_OFFSET);
-//  }
-//  /*****************************************************************************/
-//  /**
-//   * Set the channel to run in parking mode
-//   *
-//   * @param Channel is the pointer to the channel to work on
-//   *
-//   * @return
-//   *   - XST_SUCCESS if everything is fine
-//   *   - XST_FAILURE if hardware is not running
-//   *
-//   *****************************************************************************/
-//  int XAxiVdma_ChannelStartParking(XAxiVdma_Channel *Channel)
-//  {
-//      u32 CrBits;
-//
-//      if (!XAxiVdma_ChannelIsRunning(Channel)) {
-//          xdbg_printf(XDBG_DEBUG_ERROR,
-//              "Channel is not running, cannot start park mode\r\n");
-//
-//          return XST_FAILURE;
-//      }
-//
-//      CrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET) &
-//                  ~XAXIVDMA_CR_TAIL_EN_MASK;
-//
-//      XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
-//          CrBits);
-//
-//      return XST_SUCCESS;
-//  }
-//
-//  /*****************************************************************************/
-//  /**
-//   * Set the channel to run in circular mode, exiting parking mode
-//   *
-//   * @param Channel is the pointer to the channel to work on
-//   *
-//   * @return
-//   *   None
-//   *
-//   *****************************************************************************/
-//  void XAxiVdma_ChannelStopParking(XAxiVdma_Channel *Channel)
-//  {
-//      u32 CrBits;
-//
-//      CrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET) |
-//                  XAXIVDMA_CR_TAIL_EN_MASK;
-//
-//      XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
-//          CrBits);
-//
-//      return;
-//  }
-//  /*****************************************************************************/
-//  /**
-//   * Set the channel to run in frame count enable mode
-//   *
-//   * @param Channel is the pointer to the channel to work on
-//   *
-//   * @return
-//   *   None
-//   *
-//   *****************************************************************************/
-//  void XAxiVdma_ChannelStartFrmCntEnable(XAxiVdma_Channel *Channel)
-//  {
-//      u32 CrBits;
-//
-//      CrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET) |
-//                  XAXIVDMA_CR_FRMCNT_EN_MASK;
-//
-//      XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
-//          CrBits);
-//
-//      return;
-//  }
-//
-//  /*****************************************************************************/
-//  /**
-//   * Setup BD addresses to a different memory region
-//   *
-//   * In some systems, it is convenient to put BDs into a certain region of the
-//   * memory. This function enables that.
-//   *
-//   * @param Channel is the pointer to the channel to work on
-//   * @param BdAddrPhys is the physical starting address for BDs
-//   * @param BdAddrVirt is the Virtual starting address for BDs. For systems that
-//   *         do not use MMU, then virtual address is the same as physical address
-//   *
-//   * @return
-//   * - XST_SUCCESS for a successful setup
-//   * - XST_DEVICE_BUSY if the DMA channel is not idle, BDs are still being used
-//   *
-//   * @notes
-//   * We assume that the memory region starting from BdAddrPhys is large enough
-//   * to hold all the BDs.
-//   *
-//   *****************************************************************************/
-//   int XAxiVdma_ChannelSetBdAddrs(XAxiVdma_Channel *Channel, UINTPTR BdAddrPhys,
-//           UINTPTR BdAddrVirt)
-//   {
-//       int NumFrames = Channel->AllCnt;
-//       int i;
-//       UINTPTR NextPhys = BdAddrPhys;
-//       UINTPTR CurrVirt = BdAddrVirt;
-//
-//       if (Channel->HasSG && XAxiVdma_ChannelIsBusy(Channel)) {
-//           xdbg_printf(XDBG_DEBUG_ERROR,
-//               "Channel is busy, cannot setup engine for transfer\r\n");
-//
-//           return XST_DEVICE_BUSY;
-//       }
-//
-//       memset((void *)BdAddrPhys, 0, NumFrames * sizeof(XAxiVdma_Bd));
-//       memset((void *)BdAddrVirt, 0, NumFrames * sizeof(XAxiVdma_Bd));
-//
-//       /* Set up the BD link list */
-//       for (i = 0; i < NumFrames; i++) {
-//           XAxiVdma_Bd *BdPtr;
-//
-//           BdPtr = (XAxiVdma_Bd *)CurrVirt;
-//
-//           /* The last BD connects to the first BD
-//            */
-//           if (i == (NumFrames - 1)) {
-//               NextPhys = BdAddrPhys;
-//           }
-//           else {
-//               NextPhys += sizeof(XAxiVdma_Bd);
-//           }
-//
-//           XAxiVdma_BdSetNextPtr(BdPtr, NextPhys);
-//           CurrVirt += sizeof(XAxiVdma_Bd);
-//       }
-//
-//       /* Setup the BD addresses so that access the head/tail BDs fast
-//        *
-//        */
-//       Channel->HeadBdPhysAddr = BdAddrPhys;
-//       Channel->HeadBdAddr = BdAddrVirt;
-//       Channel->TailBdPhysAddr = BdAddrPhys +
-//                                 (NumFrames - 1) * sizeof(XAxiVdma_Bd);
-//       Channel->TailBdAddr = BdAddrVirt +
-//                                 (NumFrames - 1) * sizeof(XAxiVdma_Bd);
-//
-//       return XST_SUCCESS;
-//   }
-//   /*****************************************************************************/
-//   /**
-//    * Start a transfer
-//    *
-//    * This function setup the DMA engine and start the engine to do the transfer.
-//    *
-//    * @param Channel is the pointer to the channel to work on
-//    * @param ChannelCfgPtr is the pointer to the setup structure
-//    *
-//    * @return
-//    * - XST_SUCCESS for a successful submission
-//    * - XST_FAILURE if channel has not being initialized
-//    * - XST_DEVICE_BUSY if the DMA channel is not idle, BDs are still being used
-//    * - XST_INVAID_PARAM if parameters in config structure not valid
-//    *
-//    *****************************************************************************/
-//   int XAxiVdma_ChannelStartTransfer(XAxiVdma_Channel *Channel,
-//       XAxiVdma_ChannelSetup *ChannelCfgPtr)
-//   {
-//       int Status;
-//
-//       if (!Channel->IsValid) {
-//           xdbg_printf(XDBG_DEBUG_ERROR, "Channel not initialized\r\n");
-//
-//           return XST_FAILURE;
-//       }
-//
-//       if (Channel->HasSG && XAxiVdma_ChannelIsBusy(Channel)) {
-//           xdbg_printf(XDBG_DEBUG_ERROR,
-//               "Channel is busy, cannot setup engine for transfer\r\n");
-//
-//           return XST_DEVICE_BUSY;
-//       }
-//
-//       Status = XAxiVdma_ChannelConfig(Channel, ChannelCfgPtr);
-//       if (Status != XST_SUCCESS) {
-//           xdbg_printf(XDBG_DEBUG_ERROR,
-//               "Channel config failed %d\r\n", Status);
-//
-//           return Status;
-//       }
-//
-//       Status = XAxiVdma_ChannelSetBufferAddr(Channel,
-//           ChannelCfgPtr->FrameStoreStartAddr, Channel->AllCnt);
-//       if (Status != XST_SUCCESS) {
-//           xdbg_printf(XDBG_DEBUG_ERROR,
-//               "Channel setup buffer addr failed %d\r\n", Status);
-//
-//           return Status;
-//       }
-//
-//       Status = XAxiVdma_ChannelStart(Channel);
-//       if (Status != XST_SUCCESS) {
-//           xdbg_printf(XDBG_DEBUG_ERROR,
-//               "Channel start failed %d\r\n", Status);
-//
-//           return Status;
-//       }
-//
-//       return XST_SUCCESS;
-//   }
-/*****************************************************************************/
-/**
-* Configure one DMA channel using the configuration structure
-*
-* Setup the control register and BDs, however, BD addresses are not set.
-*
-* @param Channel is the pointer to the channel to work on
-* @param ChannelCfgPtr is the pointer to the setup structure
-*
-* @return
-* - XST_SUCCESS if successful
-* - XST_FAILURE if channel has not being initialized
-* - XST_DEVICE_BUSY if the DMA channel is not idle
-* - XST_INVALID_PARAM if fields in ChannelCfgPtr is not valid
-*
-*****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
        XAxiVdma_ChannelSetup *ChannelCfgPtr)
 {
@@ -577,7 +360,7 @@ int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
 
    Channel->Vsize = ChannelCfgPtr->VertSizeInput;
 
-   /* Check whether Hsize is properly aligned */
+   // Check whether Hsize is properly aligned
    if (Channel->direction == XAXIVDMA_WRITE) {
        if (ChannelCfgPtr->HoriSizeInput < Channel->WordLength) {
            hsize_align = (u32)Channel->WordLength;
@@ -598,7 +381,7 @@ int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
        }
    }
 
-   /* Check whether Stride is properly aligned */
+   // Check whether Stride is properly aligned
    if (ChannelCfgPtr->Stride < Channel->WordLength) {
        stride_align = (u32)Channel->WordLength;
    } else {
@@ -606,16 +389,14 @@ int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
        if (stride_align > 0)
            stride_align = (Channel->WordLength - stride_align);
    }
-   /* If hardware has no DRE, then Hsize and Stride must
-    * be word-aligned
-    */
+   // If hardware has no DRE, then Hsize and Stride must be word-aligned
    if (!Channel->HasDRE) {
        if (hsize_align != 0) {
-           /* Adjust hsize to multiples of stream/mm data width*/
+           // Adjust hsize to multiples of stream/mm data width
            ChannelCfgPtr->HoriSizeInput += hsize_align;
        }
        if (stride_align != 0) {
-           /* Adjust stride to multiples of stream/mm data width*/
+           // Adjust stride to multiples of stream/mm data width
            ChannelCfgPtr->Stride += stride_align;
        }
    }
@@ -633,7 +414,7 @@ int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
        CrBits |= XAXIVDMA_CR_TAIL_EN_MASK;
    }
    else {
-       /* Park mode */
+       // Park mode
        u32 FrmBits;
        u32 RegValue;
 
@@ -709,17 +490,12 @@ int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
    CrBits |= (ChannelCfgPtr->PointNum << XAXIVDMA_CR_RD_PTR_SHIFT) &
        XAXIVDMA_CR_RD_PTR_MASK;
 
-   /* Write the control register value out
-    */
+   // Write the control register value out
    XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
        CrBits);
 
    if (Channel->HasSG) {
-       /* Setup the information in BDs
-        *
-        * All information is available except the buffer addrs
-        * Buffer addrs are set through XAxiVdma_ChannelSetBufferAddr()
-        */
+       // Setup the information in BDs
        NumBds = Channel->AllCnt;
 
        for (i = 0; i < NumBds; i++) {
@@ -763,7 +539,7 @@ int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
            }
        }
    }
-   else {   /* direct register mode */
+   else {   // direct register mode */
        if ((ChannelCfgPtr->VertSizeInput > XAXIVDMA_MAX_VSIZE) ||
            (ChannelCfgPtr->VertSizeInput <= 0) ||
            (ChannelCfgPtr->HoriSizeInput > XAXIVDMA_MAX_HSIZE) ||
@@ -787,28 +563,7 @@ int XAxiVdma_ChannelConfig(XAxiVdma_Channel *Channel,
 
    return XST_SUCCESS;
 }
-/*****************************************************************************/
-/**
- * Configure buffer addresses for one DMA channel
- *
- * The buffer addresses are physical addresses.
- * Access to 32 Frame Buffer Addresses in direct mode is done through
- * XAxiVdma_ChannelHiFrmAddrEnable/Disable Functions.
- * 0 - Access Bank0 Registers (0x5C - 0x98)
- * 1 - Access Bank1 Registers (0x5C - 0x98)
- *
- * @param Channel is the pointer to the channel to work on
- * @param BufferAddrSet is the set of addresses for the transfers
- * @param NumFrames is the number of frames to set the address
- *
- * @return
- * - XST_SUCCESS if successful
- * - XST_FAILURE if channel has not being initialized
- * - XST_DEVICE_BUSY if the DMA channel is not idle, BDs are still being used
- * - XST_INVAID_PARAM if buffer address not valid, for example, unaligned
- * address with no DRE built in the hardware
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 int XAxiVdma_ChannelSetBufferAddr(XAxiVdma_Channel *Channel,
         UINTPTR *BufferAddrSet, int NumFrames)
 {
@@ -833,9 +588,7 @@ int XAxiVdma_ChannelSetBufferAddr(XAxiVdma_Channel *Channel,
 
     WordLenBits = (u32)(Channel->WordLength - 1);
 
-    /* If hardware has no DRE, then buffer addresses must
-     * be word-aligned
-     */
+    // If hardware has no DRE, then buffer addresses must be word-aligned
     for (i = 0; i < NumFrames; i++) {
         if (!Channel->HasDRE) {
             if (BufferAddrSet[i] & WordLenBits) {
@@ -862,8 +615,7 @@ int XAxiVdma_ChannelSetBufferAddr(XAxiVdma_Channel *Channel,
             }
 
             if (Channel->AddrWidth > 32) {
-                /* For a 40-bit address XAXIVDMA_MAX_FRAMESTORE
-                 * value should be set to 16 */
+                // For a 40-bit address XAXIVDMA_MAX_FRAMESTORE value should be set to 16
                 XAxiVdma_WriteReg(Channel->StartAddrBase,
                     XAXIVDMA_START_ADDR_OFFSET +
                     Loop16 * XAXIVDMA_START_ADDR_LEN + i*4,
@@ -890,21 +642,7 @@ int XAxiVdma_ChannelSetBufferAddr(XAxiVdma_Channel *Channel,
 
     return XST_SUCCESS;
 }
-/*****************************************************************************/
-/**
- * Start one DMA channel
- *
- * @param Channel is the pointer to the channel to work on
- *
- * @return
- * - XST_SUCCESS if successful
- * - XST_FAILURE if channel is not initialized
- * - XST_DMA_ERROR if:
- *   . The DMA channel fails to stop
- *   . The DMA channel fails to start
- * - XST_DEVICE_BUSY is the channel is doing transfers
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 int XAxiVdma_ChannelStart(XAxiVdma_Channel *Channel)
 {
     u32 CrBits;
@@ -924,24 +662,18 @@ int XAxiVdma_ChannelStart(XAxiVdma_Channel *Channel)
     }else
 		xil_printf("Channel initialized\r\n");
 
-    /* If channel is not running, setup the CDESC register and
-     * set the channel to run
-     */
+    // If channel is not running, setup the CDESC register and set the channel to run
     if (!XAxiVdma_ChannelIsRunning(Channel)) {
 
         if (Channel->HasSG) {
-            /* Set up the current bd register
-             *
-             * Can only setup current bd register when channel is halted
-             */
+            // Set up the current bd register
+            // Can only setup current bd register when channel is halted
             XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CDESC_OFFSET,
                 Channel->HeadBdPhysAddr);
         }
 
-        /* Start DMA hardware
-         */
-        CrBits = XAxiVdma_ReadReg(Channel->ChanBase,
-             XAXIVDMA_CR_OFFSET);
+        // Start DMA hardware
+        CrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET);
 
         CrBits = XAxiVdma_ReadReg(Channel->ChanBase,
              XAXIVDMA_CR_OFFSET) | XAXIVDMA_CR_RUNSTOP_MASK;
@@ -950,24 +682,18 @@ int XAxiVdma_ChannelStart(XAxiVdma_Channel *Channel)
             CrBits);
 
     }
+
     if (XAxiVdma_ChannelIsRunning(Channel)) {
 
-        /* Start DMA transfers
-         *
-         */
+        // Start DMA transfers
 
         if (Channel->HasSG) {
-            /* SG mode:
-             * Update the tail pointer so that hardware will start
-             * fetching BDs
-             */
+            // SG mode:
             XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_TDESC_OFFSET,
                Channel->TailBdPhysAddr);
         }
         else {
-            /* Direct register mode:
-             * Update vsize to start the channel
-             */
+            // Direct register mode:
             XAxiVdma_WriteReg(Channel->StartAddrBase,
                 XAXIVDMA_VSIZE_OFFSET, Channel->Vsize);
 
@@ -977,22 +703,12 @@ int XAxiVdma_ChannelStart(XAxiVdma_Channel *Channel)
     }
     else {
         xdbg_printf(XDBG_DEBUG_ERROR,
-            "Failed to start channel %x\r\n",
-                (unsigned int)Channel->ChanBase);
+            "Failed to start channel %x\r\n", (unsigned int)Channel->ChanBase);
 
         return XST_DMA_ERROR;
     }
 }
-/*****************************************************************************/
-/**
- * Stop one DMA channel
- *
- * @param Channel is the pointer to the channel to work on
- *
- * @return
- *  None
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 void XAxiVdma_ChannelStop(XAxiVdma_Channel *Channel)
 {
     u32 CrBits;
@@ -1001,8 +717,7 @@ void XAxiVdma_ChannelStop(XAxiVdma_Channel *Channel)
         return;
     }
 
-    /* Clear the RS bit in CR register
-     */
+    // Clear the RS bit in CR register
     CrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET) &
         (~XAXIVDMA_CR_RUNSTOP_MASK);
 
@@ -1010,16 +725,7 @@ void XAxiVdma_ChannelStop(XAxiVdma_Channel *Channel)
 
     return;
 }
-/*****************************************************************************/
-/**
- * Dump registers from one DMA channel
- *
- * @param Channel is the pointer to the channel to work on
- *
- * @return
- *  None
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 void XAxiVdma_ChannelRegisterDump(XAxiVdma_Channel *Channel)
 {
     xil_printf("Dump register for channel %p:\r\n", (void *)Channel->ChanBase);
@@ -1034,270 +740,13 @@ void XAxiVdma_ChannelRegisterDump(XAxiVdma_Channel *Channel)
 
     return;
 }
-// /*****************************************************************************/
-// /**
-//  * Set the frame counter and delay counter for one channel
-//  *
-//  * @param Channel is the pointer to the channel to work on
-//  * @param FrmCnt is the frame counter value to be set
-//  * @param DlyCnt is the delay counter value to be set
-//  *
-//  * @return
-//  *   - XST_SUCCESS if setup finishes successfully
-//  *   - XST_FAILURE if channel is not initialized
-//  *   - XST_INVALID_PARAM if the configuration structure has invalid values
-//  *   - XST_NO_FEATURE if Frame Counter or Delay Counter is disabled
-//  *
-//  *****************************************************************************/
-// int XAxiVdma_ChannelSetFrmCnt(XAxiVdma_Channel *Channel, u8 FrmCnt, u8 DlyCnt)
-// {
-//     u32 CrBits;
-//
-//     if (!Channel->IsValid) {
-//         xdbg_printf(XDBG_DEBUG_ERROR, "Channel not initialized\r\n");
-//
-//         return XST_FAILURE;
-//     }
-//
-//     if (!FrmCnt) {
-//         xdbg_printf(XDBG_DEBUG_ERROR,
-//             "Frame counter value must be non-zero\r\n");
-//
-//         return XST_INVALID_PARAM;
-//     }
-//
-//     CrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET) &
-//         ~(XAXIVDMA_DELAY_MASK | XAXIVDMA_FRMCNT_MASK);
-//
-//     if (Channel->DbgFeatureFlags & XAXIVDMA_ENABLE_DBG_FRM_CNTR) {
-//         CrBits |= (FrmCnt << XAXIVDMA_FRMCNT_SHIFT);
-//     } else {
-//         xdbg_printf(XDBG_DEBUG_ERROR,
-//             "Channel Frame counter is disabled\r\n");
-//         return XST_NO_FEATURE;
-//     }
-//     if (Channel->DbgFeatureFlags & XAXIVDMA_ENABLE_DBG_DLY_CNTR) {
-//         CrBits |= (DlyCnt << XAXIVDMA_DELAY_SHIFT);
-//     } else {
-//         xdbg_printf(XDBG_DEBUG_ERROR,
-//             "Channel Delay counter is disabled\r\n");
-//         return XST_NO_FEATURE;
-//     }
-//
-//     XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
-//         CrBits);
-//
-//     return XST_SUCCESS;
-// }
-// /*****************************************************************************/
-// /**
-//  * Get the frame counter and delay counter for both channels
-//  *
-//  * @param Channel is the pointer to the channel to work on
-//  * @param FrmCnt is the pointer for the returning frame counter value
-//  * @param DlyCnt is the pointer for the returning delay counter value
-//  *
-//  * @return
-//  *  None
-//  *
-//  * @note
-//  *  If FrmCnt return as 0, then the channel is not initialized
-//  *****************************************************************************/
-// void XAxiVdma_ChannelGetFrmCnt(XAxiVdma_Channel *Channel, u8 *FrmCnt,
-//         u8 *DlyCnt)
-// {
-//     u32 CrBits;
-//
-//     if (!Channel->IsValid) {
-//         xdbg_printf(XDBG_DEBUG_ERROR, "Channel not initialized\r\n");
-//
-//         *FrmCnt = 0;
-//         return;
-//     }
-//
-//     CrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET);
-//
-//     if (Channel->DbgFeatureFlags & XAXIVDMA_ENABLE_DBG_FRM_CNTR) {
-//         *FrmCnt = (CrBits & XAXIVDMA_FRMCNT_MASK) >>
-//                 XAXIVDMA_FRMCNT_SHIFT;
-//     } else {
-//         xdbg_printf(XDBG_DEBUG_ERROR,
-//             "Channel Frame counter is disabled\r\n");
-//     }
-//     if (Channel->DbgFeatureFlags & XAXIVDMA_ENABLE_DBG_DLY_CNTR) {
-//         *DlyCnt = (CrBits & XAXIVDMA_DELAY_MASK) >>
-//                 XAXIVDMA_DELAY_SHIFT;
-//     } else {
-//         xdbg_printf(XDBG_DEBUG_ERROR,
-//             "Channel Delay counter is disabled\r\n");
-//     }
-//
-//
-//     return;
-// }
-// /*****************************************************************************/
-// /**
-//  * Enable interrupts for a channel. Interrupts that are not specified by the
-//  * interrupt mask are not affected.
-//  *
-//  * @param Channel is the pointer to the channel to work on
-//  * @param IntrType is the interrupt mask for interrupts to be enabled
-//  *
-//  * @return
-//  *  None.
-//  *
-//  *****************************************************************************/
-// void XAxiVdma_ChannelEnableIntr(XAxiVdma_Channel *Channel, u32 IntrType)
-// {
-//     u32 CrBits;
-//
-//     if ((IntrType & XAXIVDMA_IXR_ALL_MASK) == 0) {
-//         xdbg_printf(XDBG_DEBUG_ERROR,
-//             "Enable intr with null intr mask value %x\r\n",
-//             (unsigned int)IntrType);
-//
-//         return;
-//     }
-//
-//     CrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET) &
-//               ~XAXIVDMA_IXR_ALL_MASK;
-//
-//     CrBits |= IntrType & XAXIVDMA_IXR_ALL_MASK;
-//
-//     XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
-//         CrBits);
-//
-//     return;
-// }
-// /*****************************************************************************/
-// /**
-//  * Disable interrupts for a channel. Interrupts that are not specified by the
-//  * interrupt mask are not affected.
-//  *
-//  * @param Channel is the pointer to the channel to work on
-//  * @param IntrType is the interrupt mask for interrupts to be disabled
-//  *
-//  * @return
-//  *  None.
-//  *
-//  *****************************************************************************/
-// void XAxiVdma_ChannelDisableIntr(XAxiVdma_Channel *Channel, u32 IntrType)
-// {
-//     u32 CrBits;
-//     u32 IrqBits;
-//
-//     if ((IntrType & XAXIVDMA_IXR_ALL_MASK) == 0) {
-//         xdbg_printf(XDBG_DEBUG_ERROR,
-//             "Disable intr with null intr mask value %x\r\n",
-//             (unsigned int)IntrType);
-//
-//         return;
-//     }
-//
-//     CrBits = XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET);
-//
-//     IrqBits = (CrBits & XAXIVDMA_IXR_ALL_MASK) &
-//                ~(IntrType & XAXIVDMA_IXR_ALL_MASK);
-//
-//     CrBits &= ~XAXIVDMA_IXR_ALL_MASK;
-//
-//     XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET,
-//         CrBits | IrqBits);
-//
-//     return;
-// }
-//
-// /*****************************************************************************/
-// /**
-//  * Get pending interrupts of a channel.
-//  *
-//  * @param Channel is the pointer to the channel to work on
-//  *
-//  * @return
-//  *  The interrupts mask represents pending interrupts.
-//  *
-//  *****************************************************************************/
-// u32 XAxiVdma_ChannelGetPendingIntr(XAxiVdma_Channel *Channel)
-// {
-//     return (XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_SR_OFFSET) &
-//               XAXIVDMA_IXR_ALL_MASK);
-// }
-// /*****************************************************************************/
-// /**
-//  * Clear interrupts of a channel. Interrupts that are not specified by the
-//  * interrupt mask are not affected.
-//  *
-//  * @param Channel is the pointer to the channel to work on
-//  * @param IntrType is the interrupt mask for interrupts to be cleared
-//  *
-//  * @return
-//  *  None.
-//  *
-//  *****************************************************************************/
-// void XAxiVdma_ChannelIntrClear(XAxiVdma_Channel *Channel, u32 IntrType)
-// {
-//
-//     if ((IntrType & XAXIVDMA_IXR_ALL_MASK) == 0) {
-//         xdbg_printf(XDBG_DEBUG_ERROR,
-//             "Clear intr with null intr mask value %x\r\n",
-//             (unsigned int)IntrType);
-//
-//         return;
-//     }
-//
-//     /* Only interrupts bits are writable in status register
-//      */
-//     XAxiVdma_WriteReg(Channel->ChanBase, XAXIVDMA_SR_OFFSET,
-//         IntrType & XAXIVDMA_IXR_ALL_MASK);
-//
-//     return;
-// }
-//
-// /*****************************************************************************/
-// /**
-//  * Get the enabled interrupts of a channel.
-//  *
-//  * @param Channel is the pointer to the channel to work on
-//  *
-//  * @return
-//  *  The interrupts mask represents pending interrupts.
-//  *
-//  *****************************************************************************/
-// u32 XAxiVdma_ChannelGetEnabledIntr(XAxiVdma_Channel *Channel)
-// {
-//     return (XAxiVdma_ReadReg(Channel->ChanBase, XAXIVDMA_CR_OFFSET) &
-//               XAXIVDMA_IXR_ALL_MASK);
-// }
-/*********************** BD Functions ****************************************/
-/*****************************************************************************/
-/*
- * Read one word from BD
- *
- * @param BdPtr is the BD to work on
- * @param Offset is the byte offset to read from
- *
- * @return
- *  The word value
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 static u32 XAxiVdma_BdRead(XAxiVdma_Bd *BdPtr, int Offset)
 {
     DBG("%s: RD %08X\n", __FUNCTION__, (uint32_t)BdPtr+Offset);
     return (*(u32 *)((UINTPTR)(void *)BdPtr + Offset));
 }
-
-/*****************************************************************************/
-/*
- * Set one word in BD
- *
- * @param BdPtr is the BD to work on
- * @param Offset is the byte offset to write to
- * @param Value is the value to write to the BD
- *
- * @return
- *  None
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 static void XAxiVdma_BdWrite(XAxiVdma_Bd *BdPtr, int Offset, u32 Value)
 {
     // DBG("%s: WR %08X <- %08X\n", __FUNCTION__, (uint32_t)BdPtr+Offset, Value);
@@ -1305,55 +754,20 @@ static void XAxiVdma_BdWrite(XAxiVdma_Bd *BdPtr, int Offset, u32 Value)
 
     return;
 }
-
-/*****************************************************************************/
-/*
- * Set the next ptr from BD
- *
- * @param BdPtr is the BD to work on
- * @param NextPtr is the next ptr to set in BD
- *
- * @return
- *  None
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 static void XAxiVdma_BdSetNextPtr(XAxiVdma_Bd *BdPtr, u32 NextPtr)
 {
     XAxiVdma_BdWrite(BdPtr, XAXIVDMA_BD_NDESC_OFFSET, NextPtr);
     return;
 }
-/*****************************************************************************/
-/*
- * Set the start address from BD
- *
- * The address is physical address.
- *
- * @param BdPtr is the BD to work on
- * @param Addr is the address to set in BD
- *
- * @return
- *  None
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 static void XAxiVdma_BdSetAddr(XAxiVdma_Bd *BdPtr, u32 Addr)
 {
     XAxiVdma_BdWrite(BdPtr, XAXIVDMA_BD_START_ADDR_OFFSET, Addr);
 
     return;
 }
-
-/*****************************************************************************/
-/*
- * Set the vertical size for a BD
- *
- * @param BdPtr is the BD to work on
- * @param Vsize is the vertical size to set in BD
- *
- * @return
- *  - XST_SUCCESS if successful
- *  - XST_INVALID_PARAM if argument Vsize is invalid
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 static int XAxiVdma_BdSetVsize(XAxiVdma_Bd *BdPtr, int Vsize)
 {
     if ((Vsize <= 0) || (Vsize > XAXIVDMA_VSIZE_MASK)) {
@@ -1366,18 +780,7 @@ static int XAxiVdma_BdSetVsize(XAxiVdma_Bd *BdPtr, int Vsize)
     XAxiVdma_BdWrite(BdPtr, XAXIVDMA_BD_VSIZE_OFFSET, Vsize);
     return XST_SUCCESS;
 }
-/*****************************************************************************/
-/*
- * Set the horizontal size for a BD
- *
- * @param BdPtr is the BD to work on
- * @param Hsize is the horizontal size to set in BD
- *
- * @return
- *  - XST_SUCCESS if successful
- *  - XST_INVALID_PARAM if argument Hsize is invalid
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 static int XAxiVdma_BdSetHsize(XAxiVdma_Bd *BdPtr, int Hsize)
 {
     if ((Hsize <= 0) || (Hsize > XAXIVDMA_HSIZE_MASK)) {
@@ -1390,19 +793,7 @@ static int XAxiVdma_BdSetHsize(XAxiVdma_Bd *BdPtr, int Hsize)
     XAxiVdma_BdWrite(BdPtr, XAXIVDMA_BD_HSIZE_OFFSET, Hsize);
     return XST_SUCCESS;
 }
-
-/*****************************************************************************/
-/*
- * Set the stride size for a BD
- *
- * @param BdPtr is the BD to work on
- * @param Stride is the stride size to set in BD
- *
- * @return
- *  - XST_SUCCESS if successful
- *  - XST_INVALID_PARAM if argument Stride is invalid
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 static int XAxiVdma_BdSetStride(XAxiVdma_Bd *BdPtr, int Stride)
 {
     u32 Bits;
@@ -1421,18 +812,7 @@ static int XAxiVdma_BdSetStride(XAxiVdma_Bd *BdPtr, int Stride)
 
     return XST_SUCCESS;
 }
-/*****************************************************************************/
-/*
- * Set the frame delay for a BD
- *
- * @param BdPtr is the BD to work on
- * @param FrmDly is the frame delay value to set in BD
- *
- * @return
- *  - XST_SUCCESS if successful
- *  - XST_INVALID_PARAM if argument FrmDly is invalid
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 static int XAxiVdma_BdSetFrmDly(XAxiVdma_Bd *BdPtr, int FrmDly)
 {
     u32 Bits;
@@ -1452,193 +832,278 @@ static int XAxiVdma_BdSetFrmDly(XAxiVdma_Bd *BdPtr, int FrmDly)
 
     return XST_SUCCESS;
 }
-
-
-
+//--------------------------------------------------------------------------------------------------------------
 XAxiVdma_Config XAxiVdma_ConfigTable[XPAR_XAXIVDMA_NUM_INSTANCES] =
 {
-    {
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_DEVICE_ID,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_BASEADDR,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_NUM_FSTORES,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_INCLUDE_MM2S,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_INCLUDE_MM2S_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_M_AXI_MM2S_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_INCLUDE_S2MM,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_INCLUDE_S2MM_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_M_AXI_S2MM_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_INCLUDE_SG,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_VIDPRMTR_READS,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_USE_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_FLUSH_ON_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_MM2S_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_S2MM_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_MM2S_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_S2MM_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_INCLUDE_INTERNAL_GENLOCK,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_S2MM_SOF_ENABLE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_M_AXIS_MM2S_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_S_AXIS_S2MM_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_DEBUG_INFO_1,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_DEBUG_INFO_5,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_DEBUG_INFO_6,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_DEBUG_INFO_7,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_DEBUG_INFO_9,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_DEBUG_INFO_13,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_DEBUG_INFO_14,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_DEBUG_INFO_15,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ENABLE_DEBUG_ALL,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_0_ADDR_WIDTH
-    },
-    {
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_DEVICE_ID,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_BASEADDR,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_NUM_FSTORES,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_INCLUDE_MM2S,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_INCLUDE_MM2S_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_M_AXI_MM2S_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_INCLUDE_S2MM,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_INCLUDE_S2MM_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_M_AXI_S2MM_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_INCLUDE_SG,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_VIDPRMTR_READS,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_USE_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_FLUSH_ON_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_MM2S_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_S2MM_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_MM2S_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_S2MM_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_INCLUDE_INTERNAL_GENLOCK,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_S2MM_SOF_ENABLE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_M_AXIS_MM2S_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_S_AXIS_S2MM_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_DEBUG_INFO_1,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_DEBUG_INFO_5,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_DEBUG_INFO_6,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_DEBUG_INFO_7,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_DEBUG_INFO_9,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_DEBUG_INFO_13,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_DEBUG_INFO_14,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_DEBUG_INFO_15,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ENABLE_DEBUG_ALL,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_1_ADDR_WIDTH
-    },
-    {
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_DEVICE_ID,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_BASEADDR,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_NUM_FSTORES,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_INCLUDE_MM2S,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_INCLUDE_MM2S_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_M_AXI_MM2S_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_INCLUDE_S2MM,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_INCLUDE_S2MM_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_M_AXI_S2MM_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_INCLUDE_SG,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_VIDPRMTR_READS,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_USE_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_FLUSH_ON_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_MM2S_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_S2MM_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_MM2S_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_S2MM_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_INCLUDE_INTERNAL_GENLOCK,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_S2MM_SOF_ENABLE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_M_AXIS_MM2S_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_S_AXIS_S2MM_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_DEBUG_INFO_1,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_DEBUG_INFO_5,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_DEBUG_INFO_6,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_DEBUG_INFO_7,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_DEBUG_INFO_9,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_DEBUG_INFO_13,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_DEBUG_INFO_14,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_DEBUG_INFO_15,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ENABLE_DEBUG_ALL,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_2_ADDR_WIDTH
-    },
-    {
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_DEVICE_ID,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_BASEADDR,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_NUM_FSTORES,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_INCLUDE_MM2S,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_INCLUDE_MM2S_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_M_AXI_MM2S_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_INCLUDE_S2MM,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_INCLUDE_S2MM_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_M_AXI_S2MM_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_INCLUDE_SG,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_VIDPRMTR_READS,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_USE_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_FLUSH_ON_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_MM2S_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_S2MM_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_MM2S_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_S2MM_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_INCLUDE_INTERNAL_GENLOCK,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_S2MM_SOF_ENABLE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_M_AXIS_MM2S_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_S_AXIS_S2MM_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_DEBUG_INFO_1,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_DEBUG_INFO_5,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_DEBUG_INFO_6,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_DEBUG_INFO_7,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_DEBUG_INFO_9,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_DEBUG_INFO_13,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_DEBUG_INFO_14,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_DEBUG_INFO_15,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ENABLE_DEBUG_ALL,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_3_ADDR_WIDTH
-    },
-    {
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_DEVICE_ID,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_BASEADDR,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_NUM_FSTORES,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_INCLUDE_MM2S,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_INCLUDE_MM2S_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_M_AXI_MM2S_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_INCLUDE_S2MM,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_INCLUDE_S2MM_DRE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_M_AXI_S2MM_DATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_INCLUDE_SG,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_VIDPRMTR_READS,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_USE_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_FLUSH_ON_FSYNC,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_MM2S_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_S2MM_LINEBUFFER_DEPTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_MM2S_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_S2MM_GENLOCK_MODE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_INCLUDE_INTERNAL_GENLOCK,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_S2MM_SOF_ENABLE,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_M_AXIS_MM2S_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_S_AXIS_S2MM_TDATA_WIDTH,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_DEBUG_INFO_1,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_DEBUG_INFO_5,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_DEBUG_INFO_6,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_DEBUG_INFO_7,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_DEBUG_INFO_9,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_DEBUG_INFO_13,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_DEBUG_INFO_14,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_DEBUG_INFO_15,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ENABLE_DEBUG_ALL,
-        XPAR_VIDEO_SUBSYSTEM_AXI_VDMA_4_ADDR_WIDTH
-    }
+	{
+		XPAR_AXI_VDMA_1_DEVICE_ID,
+		XPAR_AXI_VDMA_1_BASEADDR,
+		XPAR_AXI_VDMA_1_NUM_FSTORES,
+		XPAR_AXI_VDMA_1_INCLUDE_MM2S,
+		XPAR_AXI_VDMA_1_INCLUDE_MM2S_DRE,
+		XPAR_AXI_VDMA_1_M_AXI_MM2S_DATA_WIDTH,
+		XPAR_AXI_VDMA_1_INCLUDE_S2MM,
+		XPAR_AXI_VDMA_1_INCLUDE_S2MM_DRE,
+		XPAR_AXI_VDMA_1_M_AXI_S2MM_DATA_WIDTH,
+		XPAR_AXI_VDMA_1_INCLUDE_SG,
+		XPAR_AXI_VDMA_1_ENABLE_VIDPRMTR_READS,
+		XPAR_AXI_VDMA_1_USE_FSYNC,
+		XPAR_AXI_VDMA_1_FLUSH_ON_FSYNC,
+		XPAR_AXI_VDMA_1_MM2S_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_1_S2MM_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_1_MM2S_GENLOCK_MODE,
+		XPAR_AXI_VDMA_1_S2MM_GENLOCK_MODE,
+		XPAR_AXI_VDMA_1_INCLUDE_INTERNAL_GENLOCK,
+		XPAR_AXI_VDMA_1_S2MM_SOF_ENABLE,
+		XPAR_AXI_VDMA_1_M_AXIS_MM2S_TDATA_WIDTH,
+		XPAR_AXI_VDMA_1_S_AXIS_S2MM_TDATA_WIDTH,
+		XPAR_AXI_VDMA_1_ENABLE_DEBUG_INFO_1,
+		XPAR_AXI_VDMA_1_ENABLE_DEBUG_INFO_5,
+		XPAR_AXI_VDMA_1_ENABLE_DEBUG_INFO_6,
+		XPAR_AXI_VDMA_1_ENABLE_DEBUG_INFO_7,
+		XPAR_AXI_VDMA_1_ENABLE_DEBUG_INFO_9,
+		XPAR_AXI_VDMA_1_ENABLE_DEBUG_INFO_13,
+		XPAR_AXI_VDMA_1_ENABLE_DEBUG_INFO_14,
+		XPAR_AXI_VDMA_1_ENABLE_DEBUG_INFO_15,
+		XPAR_AXI_VDMA_1_ENABLE_DEBUG_ALL,
+		XPAR_AXI_VDMA_1_ADDR_WIDTH
+	},
+	{
+		XPAR_AXI_VDMA_4_DEVICE_ID,
+		XPAR_AXI_VDMA_4_BASEADDR,
+		XPAR_AXI_VDMA_4_NUM_FSTORES,
+		XPAR_AXI_VDMA_4_INCLUDE_MM2S,
+		XPAR_AXI_VDMA_4_INCLUDE_MM2S_DRE,
+		XPAR_AXI_VDMA_4_M_AXI_MM2S_DATA_WIDTH,
+		XPAR_AXI_VDMA_4_INCLUDE_S2MM,
+		XPAR_AXI_VDMA_4_INCLUDE_S2MM_DRE,
+		XPAR_AXI_VDMA_4_M_AXI_S2MM_DATA_WIDTH,
+		XPAR_AXI_VDMA_4_INCLUDE_SG,
+		XPAR_AXI_VDMA_4_ENABLE_VIDPRMTR_READS,
+		XPAR_AXI_VDMA_4_USE_FSYNC,
+		XPAR_AXI_VDMA_4_FLUSH_ON_FSYNC,
+		XPAR_AXI_VDMA_4_MM2S_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_4_S2MM_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_4_MM2S_GENLOCK_MODE,
+		XPAR_AXI_VDMA_4_S2MM_GENLOCK_MODE,
+		XPAR_AXI_VDMA_4_INCLUDE_INTERNAL_GENLOCK,
+		XPAR_AXI_VDMA_4_S2MM_SOF_ENABLE,
+		XPAR_AXI_VDMA_4_M_AXIS_MM2S_TDATA_WIDTH,
+		XPAR_AXI_VDMA_4_S_AXIS_S2MM_TDATA_WIDTH,
+		XPAR_AXI_VDMA_4_ENABLE_DEBUG_INFO_1,
+		XPAR_AXI_VDMA_4_ENABLE_DEBUG_INFO_5,
+		XPAR_AXI_VDMA_4_ENABLE_DEBUG_INFO_6,
+		XPAR_AXI_VDMA_4_ENABLE_DEBUG_INFO_7,
+		XPAR_AXI_VDMA_4_ENABLE_DEBUG_INFO_9,
+		XPAR_AXI_VDMA_4_ENABLE_DEBUG_INFO_13,
+		XPAR_AXI_VDMA_4_ENABLE_DEBUG_INFO_14,
+		XPAR_AXI_VDMA_4_ENABLE_DEBUG_INFO_15,
+		XPAR_AXI_VDMA_4_ENABLE_DEBUG_ALL,
+		XPAR_AXI_VDMA_4_ADDR_WIDTH
+	},
+	{
+		XPAR_AXI_VDMA_3_DEVICE_ID,
+		XPAR_AXI_VDMA_3_BASEADDR,
+		XPAR_AXI_VDMA_3_NUM_FSTORES,
+		XPAR_AXI_VDMA_3_INCLUDE_MM2S,
+		XPAR_AXI_VDMA_3_INCLUDE_MM2S_DRE,
+		XPAR_AXI_VDMA_3_M_AXI_MM2S_DATA_WIDTH,
+		XPAR_AXI_VDMA_3_INCLUDE_S2MM,
+		XPAR_AXI_VDMA_3_INCLUDE_S2MM_DRE,
+		XPAR_AXI_VDMA_3_M_AXI_S2MM_DATA_WIDTH,
+		XPAR_AXI_VDMA_3_INCLUDE_SG,
+		XPAR_AXI_VDMA_3_ENABLE_VIDPRMTR_READS,
+		XPAR_AXI_VDMA_3_USE_FSYNC,
+		XPAR_AXI_VDMA_3_FLUSH_ON_FSYNC,
+		XPAR_AXI_VDMA_3_MM2S_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_3_S2MM_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_3_MM2S_GENLOCK_MODE,
+		XPAR_AXI_VDMA_3_S2MM_GENLOCK_MODE,
+		XPAR_AXI_VDMA_3_INCLUDE_INTERNAL_GENLOCK,
+		XPAR_AXI_VDMA_3_S2MM_SOF_ENABLE,
+		XPAR_AXI_VDMA_3_M_AXIS_MM2S_TDATA_WIDTH,
+		XPAR_AXI_VDMA_3_S_AXIS_S2MM_TDATA_WIDTH,
+		XPAR_AXI_VDMA_3_ENABLE_DEBUG_INFO_1,
+		XPAR_AXI_VDMA_3_ENABLE_DEBUG_INFO_5,
+		XPAR_AXI_VDMA_3_ENABLE_DEBUG_INFO_6,
+		XPAR_AXI_VDMA_3_ENABLE_DEBUG_INFO_7,
+		XPAR_AXI_VDMA_3_ENABLE_DEBUG_INFO_9,
+		XPAR_AXI_VDMA_3_ENABLE_DEBUG_INFO_13,
+		XPAR_AXI_VDMA_3_ENABLE_DEBUG_INFO_14,
+		XPAR_AXI_VDMA_3_ENABLE_DEBUG_INFO_15,
+		XPAR_AXI_VDMA_3_ENABLE_DEBUG_ALL,
+		XPAR_AXI_VDMA_3_ADDR_WIDTH
+	},
+	{
+		XPAR_AXI_VDMA_5_DEVICE_ID,
+		XPAR_AXI_VDMA_5_BASEADDR,
+		XPAR_AXI_VDMA_5_NUM_FSTORES,
+		XPAR_AXI_VDMA_5_INCLUDE_MM2S,
+		XPAR_AXI_VDMA_5_INCLUDE_MM2S_DRE,
+		XPAR_AXI_VDMA_5_M_AXI_MM2S_DATA_WIDTH,
+		XPAR_AXI_VDMA_5_INCLUDE_S2MM,
+		XPAR_AXI_VDMA_5_INCLUDE_S2MM_DRE,
+		XPAR_AXI_VDMA_5_M_AXI_S2MM_DATA_WIDTH,
+		XPAR_AXI_VDMA_5_INCLUDE_SG,
+		XPAR_AXI_VDMA_5_ENABLE_VIDPRMTR_READS,
+		XPAR_AXI_VDMA_5_USE_FSYNC,
+		XPAR_AXI_VDMA_5_FLUSH_ON_FSYNC,
+		XPAR_AXI_VDMA_5_MM2S_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_5_S2MM_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_5_MM2S_GENLOCK_MODE,
+		XPAR_AXI_VDMA_5_S2MM_GENLOCK_MODE,
+		XPAR_AXI_VDMA_5_INCLUDE_INTERNAL_GENLOCK,
+		XPAR_AXI_VDMA_5_S2MM_SOF_ENABLE,
+		XPAR_AXI_VDMA_5_M_AXIS_MM2S_TDATA_WIDTH,
+		XPAR_AXI_VDMA_5_S_AXIS_S2MM_TDATA_WIDTH,
+		XPAR_AXI_VDMA_5_ENABLE_DEBUG_INFO_1,
+		XPAR_AXI_VDMA_5_ENABLE_DEBUG_INFO_5,
+		XPAR_AXI_VDMA_5_ENABLE_DEBUG_INFO_6,
+		XPAR_AXI_VDMA_5_ENABLE_DEBUG_INFO_7,
+		XPAR_AXI_VDMA_5_ENABLE_DEBUG_INFO_9,
+		XPAR_AXI_VDMA_5_ENABLE_DEBUG_INFO_13,
+		XPAR_AXI_VDMA_5_ENABLE_DEBUG_INFO_14,
+		XPAR_AXI_VDMA_5_ENABLE_DEBUG_INFO_15,
+		XPAR_AXI_VDMA_5_ENABLE_DEBUG_ALL,
+		XPAR_AXI_VDMA_5_ADDR_WIDTH
+	},
+	{
+		XPAR_AXI_VDMA_6_DEVICE_ID,
+		XPAR_AXI_VDMA_6_BASEADDR,
+		XPAR_AXI_VDMA_6_NUM_FSTORES,
+		XPAR_AXI_VDMA_6_INCLUDE_MM2S,
+		XPAR_AXI_VDMA_6_INCLUDE_MM2S_DRE,
+		XPAR_AXI_VDMA_6_M_AXI_MM2S_DATA_WIDTH,
+		XPAR_AXI_VDMA_6_INCLUDE_S2MM,
+		XPAR_AXI_VDMA_6_INCLUDE_S2MM_DRE,
+		XPAR_AXI_VDMA_6_M_AXI_S2MM_DATA_WIDTH,
+		XPAR_AXI_VDMA_6_INCLUDE_SG,
+		XPAR_AXI_VDMA_6_ENABLE_VIDPRMTR_READS,
+		XPAR_AXI_VDMA_6_USE_FSYNC,
+		XPAR_AXI_VDMA_6_FLUSH_ON_FSYNC,
+		XPAR_AXI_VDMA_6_MM2S_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_6_S2MM_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_6_MM2S_GENLOCK_MODE,
+		XPAR_AXI_VDMA_6_S2MM_GENLOCK_MODE,
+		XPAR_AXI_VDMA_6_INCLUDE_INTERNAL_GENLOCK,
+		XPAR_AXI_VDMA_6_S2MM_SOF_ENABLE,
+		XPAR_AXI_VDMA_6_M_AXIS_MM2S_TDATA_WIDTH,
+		XPAR_AXI_VDMA_6_S_AXIS_S2MM_TDATA_WIDTH,
+		XPAR_AXI_VDMA_6_ENABLE_DEBUG_INFO_1,
+		XPAR_AXI_VDMA_6_ENABLE_DEBUG_INFO_5,
+		XPAR_AXI_VDMA_6_ENABLE_DEBUG_INFO_6,
+		XPAR_AXI_VDMA_6_ENABLE_DEBUG_INFO_7,
+		XPAR_AXI_VDMA_6_ENABLE_DEBUG_INFO_9,
+		XPAR_AXI_VDMA_6_ENABLE_DEBUG_INFO_13,
+		XPAR_AXI_VDMA_6_ENABLE_DEBUG_INFO_14,
+		XPAR_AXI_VDMA_6_ENABLE_DEBUG_INFO_15,
+		XPAR_AXI_VDMA_6_ENABLE_DEBUG_ALL,
+		XPAR_AXI_VDMA_6_ADDR_WIDTH
+	},
+	{
+		XPAR_AXI_VDMA_7_DEVICE_ID,
+		XPAR_AXI_VDMA_7_BASEADDR,
+		XPAR_AXI_VDMA_7_NUM_FSTORES,
+		XPAR_AXI_VDMA_7_INCLUDE_MM2S,
+		XPAR_AXI_VDMA_7_INCLUDE_MM2S_DRE,
+		XPAR_AXI_VDMA_7_M_AXI_MM2S_DATA_WIDTH,
+		XPAR_AXI_VDMA_7_INCLUDE_S2MM,
+		XPAR_AXI_VDMA_7_INCLUDE_S2MM_DRE,
+		XPAR_AXI_VDMA_7_M_AXI_S2MM_DATA_WIDTH,
+		XPAR_AXI_VDMA_7_INCLUDE_SG,
+		XPAR_AXI_VDMA_7_ENABLE_VIDPRMTR_READS,
+		XPAR_AXI_VDMA_7_USE_FSYNC,
+		XPAR_AXI_VDMA_7_FLUSH_ON_FSYNC,
+		XPAR_AXI_VDMA_7_MM2S_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_7_S2MM_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_7_MM2S_GENLOCK_MODE,
+		XPAR_AXI_VDMA_7_S2MM_GENLOCK_MODE,
+		XPAR_AXI_VDMA_7_INCLUDE_INTERNAL_GENLOCK,
+		XPAR_AXI_VDMA_7_S2MM_SOF_ENABLE,
+		XPAR_AXI_VDMA_7_M_AXIS_MM2S_TDATA_WIDTH,
+		XPAR_AXI_VDMA_7_S_AXIS_S2MM_TDATA_WIDTH,
+		XPAR_AXI_VDMA_7_ENABLE_DEBUG_INFO_1,
+		XPAR_AXI_VDMA_7_ENABLE_DEBUG_INFO_5,
+		XPAR_AXI_VDMA_7_ENABLE_DEBUG_INFO_6,
+		XPAR_AXI_VDMA_7_ENABLE_DEBUG_INFO_7,
+		XPAR_AXI_VDMA_7_ENABLE_DEBUG_INFO_9,
+		XPAR_AXI_VDMA_7_ENABLE_DEBUG_INFO_13,
+		XPAR_AXI_VDMA_7_ENABLE_DEBUG_INFO_14,
+		XPAR_AXI_VDMA_7_ENABLE_DEBUG_INFO_15,
+		XPAR_AXI_VDMA_7_ENABLE_DEBUG_ALL,
+		XPAR_AXI_VDMA_7_ADDR_WIDTH
+	},
+	{
+		XPAR_AXI_VDMA_8_DEVICE_ID,
+		XPAR_AXI_VDMA_8_BASEADDR,
+		XPAR_AXI_VDMA_8_NUM_FSTORES,
+		XPAR_AXI_VDMA_8_INCLUDE_MM2S,
+		XPAR_AXI_VDMA_8_INCLUDE_MM2S_DRE,
+		XPAR_AXI_VDMA_8_M_AXI_MM2S_DATA_WIDTH,
+		XPAR_AXI_VDMA_8_INCLUDE_S2MM,
+		XPAR_AXI_VDMA_8_INCLUDE_S2MM_DRE,
+		XPAR_AXI_VDMA_8_M_AXI_S2MM_DATA_WIDTH,
+		XPAR_AXI_VDMA_8_INCLUDE_SG,
+		XPAR_AXI_VDMA_8_ENABLE_VIDPRMTR_READS,
+		XPAR_AXI_VDMA_8_USE_FSYNC,
+		XPAR_AXI_VDMA_8_FLUSH_ON_FSYNC,
+		XPAR_AXI_VDMA_8_MM2S_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_8_S2MM_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_8_MM2S_GENLOCK_MODE,
+		XPAR_AXI_VDMA_8_S2MM_GENLOCK_MODE,
+		XPAR_AXI_VDMA_8_INCLUDE_INTERNAL_GENLOCK,
+		XPAR_AXI_VDMA_8_S2MM_SOF_ENABLE,
+		XPAR_AXI_VDMA_8_M_AXIS_MM2S_TDATA_WIDTH,
+		XPAR_AXI_VDMA_8_S_AXIS_S2MM_TDATA_WIDTH,
+		XPAR_AXI_VDMA_8_ENABLE_DEBUG_INFO_1,
+		XPAR_AXI_VDMA_8_ENABLE_DEBUG_INFO_5,
+		XPAR_AXI_VDMA_8_ENABLE_DEBUG_INFO_6,
+		XPAR_AXI_VDMA_8_ENABLE_DEBUG_INFO_7,
+		XPAR_AXI_VDMA_8_ENABLE_DEBUG_INFO_9,
+		XPAR_AXI_VDMA_8_ENABLE_DEBUG_INFO_13,
+		XPAR_AXI_VDMA_8_ENABLE_DEBUG_INFO_14,
+		XPAR_AXI_VDMA_8_ENABLE_DEBUG_INFO_15,
+		XPAR_AXI_VDMA_8_ENABLE_DEBUG_ALL,
+		XPAR_AXI_VDMA_8_ADDR_WIDTH
+	},
+	{
+		XPAR_AXI_VDMA_9_DEVICE_ID,
+		XPAR_AXI_VDMA_9_BASEADDR,
+		XPAR_AXI_VDMA_9_NUM_FSTORES,
+		XPAR_AXI_VDMA_9_INCLUDE_MM2S,
+		XPAR_AXI_VDMA_9_INCLUDE_MM2S_DRE,
+		XPAR_AXI_VDMA_9_M_AXI_MM2S_DATA_WIDTH,
+		XPAR_AXI_VDMA_9_INCLUDE_S2MM,
+		XPAR_AXI_VDMA_9_INCLUDE_S2MM_DRE,
+		XPAR_AXI_VDMA_9_M_AXI_S2MM_DATA_WIDTH,
+		XPAR_AXI_VDMA_9_INCLUDE_SG,
+		XPAR_AXI_VDMA_9_ENABLE_VIDPRMTR_READS,
+		XPAR_AXI_VDMA_9_USE_FSYNC,
+		XPAR_AXI_VDMA_9_FLUSH_ON_FSYNC,
+		XPAR_AXI_VDMA_9_MM2S_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_9_S2MM_LINEBUFFER_DEPTH,
+		XPAR_AXI_VDMA_9_MM2S_GENLOCK_MODE,
+		XPAR_AXI_VDMA_9_S2MM_GENLOCK_MODE,
+		XPAR_AXI_VDMA_9_INCLUDE_INTERNAL_GENLOCK,
+		XPAR_AXI_VDMA_9_S2MM_SOF_ENABLE,
+		XPAR_AXI_VDMA_9_M_AXIS_MM2S_TDATA_WIDTH,
+		XPAR_AXI_VDMA_9_S_AXIS_S2MM_TDATA_WIDTH,
+		XPAR_AXI_VDMA_9_ENABLE_DEBUG_INFO_1,
+		XPAR_AXI_VDMA_9_ENABLE_DEBUG_INFO_5,
+		XPAR_AXI_VDMA_9_ENABLE_DEBUG_INFO_6,
+		XPAR_AXI_VDMA_9_ENABLE_DEBUG_INFO_7,
+		XPAR_AXI_VDMA_9_ENABLE_DEBUG_INFO_9,
+		XPAR_AXI_VDMA_9_ENABLE_DEBUG_INFO_13,
+		XPAR_AXI_VDMA_9_ENABLE_DEBUG_INFO_14,
+		XPAR_AXI_VDMA_9_ENABLE_DEBUG_INFO_15,
+		XPAR_AXI_VDMA_9_ENABLE_DEBUG_ALL,
+		XPAR_AXI_VDMA_9_ADDR_WIDTH
+	}
 };
 
 #define INITIALIZATION_POLLING   100000
 
-/*****************************************************************************/
-/**
- * Get a channel
- *
- * @param InstancePtr is the DMA engine to work on
- * @param Direction is the direction for the channel to get
- *
- * @return
- * The pointer to the channel. Upon error, return NULL.
- *
- * @note
- * Since this function is internally used, we assume Direction is valid
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 XAxiVdma_Channel *XAxiVdma_GetChannel(XAxiVdma *InstancePtr,
         u16 Direction)
 {
@@ -1656,7 +1121,7 @@ XAxiVdma_Channel *XAxiVdma_GetChannel(XAxiVdma *InstancePtr,
         return NULL;
     }
 }
-
+//--------------------------------------------------------------------------------------------------------------
 static int XAxiVdma_Major(XAxiVdma *InstancePtr) {
     u32 Reg;
 
@@ -1665,22 +1130,7 @@ static int XAxiVdma_Major(XAxiVdma *InstancePtr) {
     return (int)((Reg & XAXIVDMA_VERSION_MAJOR_MASK) >>
               XAXIVDMA_VERSION_MAJOR_SHIFT);
 }
-
-/*****************************************************************************/
-/**
- * Initialize the driver with hardware configuration
- *
- * @param InstancePtr is the pointer to the DMA engine to work on
- * @param CfgPtr is the pointer to the hardware configuration structure
- * @param EffectiveAddr is the virtual address map for the device
- *
- * @return
- *  - XST_SUCCESS if everything goes fine
- *  - XST_FAILURE if reset the hardware failed, need system reset to recover
- *
- * @note
- * If channel fails reset,  then it will be set as invalid
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 				UINTPTR EffectiveAddr)
 {
@@ -1688,12 +1138,11 @@ int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 	XAxiVdma_Channel *WrChannel;
 	int Polls;
 
-	// /* Validate parameters */
+	// // Validate parameters */
 	// Xil_AssertNonvoid(InstancePtr != NULL);
 	// Xil_AssertNonvoid(CfgPtr != NULL);
 
-	/* Initially, no interrupt callback functions
-	 */
+	// Initially, no interrupt callback functions
 	InstancePtr->ReadCallBack.CompletionCallBack = 0x0;
 	InstancePtr->ReadCallBack.ErrCallBack = 0x0;
 	InstancePtr->WriteCallBack.CompletionCallBack = 0x0;
@@ -1714,8 +1163,7 @@ int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 		InstancePtr->HasSG = CfgPtr->HasSG;
 	}
 
-	/* The channels are not valid until being initialized
-	 */
+	// The channels are not valid until being initialized
 	RdChannel = XAxiVdma_GetChannel(InstancePtr, XAXIVDMA_READ);
 	RdChannel->IsValid = 0;
 
@@ -1733,10 +1181,10 @@ int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 
 		RdChannel->NumFrames = CfgPtr->MaxFrameStoreNum;
 
-		/* Flush on Sync */
+		// Flush on Sync */
 		RdChannel->FlushonFsync = CfgPtr->FlushonFsync;
 
-		/* Dynamic Line Buffers Depth */
+		// Dynamic Line Buffers Depth */
 		RdChannel->LineBufDepth = CfgPtr->Mm2SBufDepth;
 		if(RdChannel->LineBufDepth > 0) {
 			RdChannel->LineBufThreshold =
@@ -1751,10 +1199,10 @@ int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 		RdChannel->StreamWidth = CfgPtr->Mm2SStreamWidth >> 3;
 		RdChannel->AddrWidth = InstancePtr->AddrWidth;
 
-		/* Internal GenLock */
+		// Internal GenLock */
 		RdChannel->GenLock = CfgPtr->Mm2SGenLock;
 
-		/* Debug Info Parameter flags */
+		// Debug Info Parameter flags */
 		if (!CfgPtr->EnableAllDbgFeatures) {
 			if (CfgPtr->Mm2SThresRegEn) {
 				RdChannel->DbgFeatureFlags |=
@@ -1785,9 +1233,7 @@ int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 
 		XAxiVdma_ChannelReset(RdChannel);
 
-		/* At time of initialization, no transfers are going on,
-		 * reset is expected to be quick
-		 */
+		// At time of initialization, no transfers are going on, reset is expected to be quick
 		Polls = INITIALIZATION_POLLING;
 
 		while (Polls && XAxiVdma_ChannelResetNotDone(RdChannel)) {
@@ -1814,10 +1260,10 @@ int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 		WrChannel->NumFrames = CfgPtr->MaxFrameStoreNum;
 		WrChannel->AddrWidth = InstancePtr->AddrWidth;
 
-		/* Flush on Sync */
+		// Flush on Sync
 		WrChannel->FlushonFsync = CfgPtr->FlushonFsync;
 
-		/* Dynamic Line Buffers Depth */
+		// Dynamic Line Buffers Depth
 		WrChannel->LineBufDepth = CfgPtr->S2MmBufDepth;
 		if(WrChannel->LineBufDepth > 0) {
 			WrChannel->LineBufThreshold =
@@ -1831,13 +1277,13 @@ int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 		WrChannel->WordLength = CfgPtr->S2MmWordLen >> 3;
 		WrChannel->StreamWidth = CfgPtr->S2MmStreamWidth >> 3;
 
-		/* Internal GenLock */
+		// Internal GenLock
 		WrChannel->GenLock = CfgPtr->S2MmGenLock;
 
-		/* Frame Sync Source Selection*/
+		// Frame Sync Source Selection
 		WrChannel->S2MmSOF = CfgPtr->S2MmSOF;
 
-		/* Debug Info Parameter flags */
+		// Debug Info Parameter flags
 		if (!CfgPtr->EnableAllDbgFeatures) {
 			if (CfgPtr->S2MmThresRegEn) {
 				WrChannel->DbgFeatureFlags |=
@@ -1868,9 +1314,7 @@ int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 
 		XAxiVdma_ChannelReset(WrChannel);
 
-		/* At time of initialization, no transfers are going on,
-		 * reset is expected to be quick
-		 */
+		// At time of initialization, no transfers are going on, reset is expected to be quick
 		Polls = INITIALIZATION_POLLING;
 
 		while (Polls && XAxiVdma_ChannelResetNotDone(WrChannel)) {
@@ -1890,8 +1334,7 @@ int XAxiVdma_CfgInitialize(XAxiVdma *InstancePtr, XAxiVdma_Config *CfgPtr,
 
 	return XST_SUCCESS;
 }
-
-
+//--------------------------------------------------------------------------------------------------------------
 XAxiVdma_Config *XAxiVdma_LookupConfig(u16 DeviceId)
 {
     // extern XAxiVdma_Config XAxiVdma_ConfigTable[];
@@ -1907,23 +1350,7 @@ XAxiVdma_Config *XAxiVdma_LookupConfig(u16 DeviceId)
 
     return CfgPtr;
 }
-
-/*****************************************************************************/
-/**
- * Configure one DMA channel using the configuration structure
- *
- * @param InstancePtr is the pointer to the DMA engine to work on
- * @param Direction is the DMA channel to work on
- * @param DmaConfigPtr is the pointer to the setup structure
- *
- * @return
- * - XST_SUCCESS if successful
- * - XST_DEVICE_BUSY if the DMA channel is not idle, BDs are still being used
- * - XST_INVAID_PARAM if buffer address not valid, for example, unaligned
- *   address with no DRE built in the hardware, or Direction invalid
- * - XST_DEVICE_NOT_FOUND if the channel is invalid
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 int XAxiVdma_DmaConfig(XAxiVdma *InstancePtr, u16 Direction,
         XAxiVdma_DmaSetup *DmaConfigPtr)
 {
@@ -1945,24 +1372,8 @@ int XAxiVdma_DmaConfig(XAxiVdma *InstancePtr, u16 Direction,
         return XST_DEVICE_NOT_FOUND;
     }
 }
-/*****************************************************************************/
-/**
- * Configure buffer addresses for one DMA channel
- *
- * @param InstancePtr is the pointer to the DMA engine to work on
- * @param Direction is the DMA channel to work on
- * @param BufferAddrSet is the set of addresses for the transfers
- *
- * @return
- * - XST_SUCCESS if successful
- * - XST_DEVICE_BUSY if the DMA channel is not idle, BDs are still being used
- * - XST_INVAID_PARAM if buffer address not valid, for example, unaligned
- *   address with no DRE built in the hardware, or Direction invalid
- * - XST_DEVICE_NOT_FOUND if the channel is invalid
- *
- *****************************************************************************/
-int XAxiVdma_DmaSetBufferAddr(XAxiVdma *InstancePtr, u16 Direction,
-        UINTPTR *BufferAddrSet)
+//--------------------------------------------------------------------------------------------------------------
+int XAxiVdma_DmaSetBufferAddr(XAxiVdma *InstancePtr, u16 Direction, UINTPTR *BufferAddrSet)
 {
     XAxiVdma_Channel *Channel;
 
@@ -1973,27 +1384,13 @@ int XAxiVdma_DmaSetBufferAddr(XAxiVdma *InstancePtr, u16 Direction,
     }
 
     if (Channel->IsValid) {
-        return XAxiVdma_ChannelSetBufferAddr(Channel, BufferAddrSet,
-            Channel->NumFrames);
+        return XAxiVdma_ChannelSetBufferAddr(Channel, BufferAddrSet, Channel->NumFrames);
     }
     else {
         return XST_DEVICE_NOT_FOUND;
     }
 }
-/*****************************************************************************/
-/**
- * Start one DMA channel
- *
- * @param InstancePtr is the pointer to the DMA engine to work on
- * @param Direction is the DMA channel to work on
- *
- * @return
- * - XST_SUCCESS if channel started successfully
- * - XST_FAILURE otherwise
- * - XST_DEVICE_NOT_FOUND if the channel is invalid
- * - XST_INVALID_PARAM if Direction invalid
- *
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 int XAxiVdma_DmaStart(XAxiVdma *InstancePtr, u16 Direction)
 {
     XAxiVdma_Channel *Channel;
@@ -2011,48 +1408,26 @@ int XAxiVdma_DmaStart(XAxiVdma *InstancePtr, u16 Direction)
         return XST_DEVICE_NOT_FOUND;
     }
 }
-/*****************************************************************************/
-/**
- * Stop one DMA channel
- *
- * @param InstancePtr is the pointer to the DMA engine to work on
- * @param Direction is the DMA channel to work on
- *
- * @return
- *  None
- *
- * @note
- * If channel is invalid, then do nothing on that channel
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 void XAxiVdma_DmaStop(XAxiVdma *InstancePtr, u16 Direction)
 {
     XAxiVdma_Channel *Channel;
 
     Channel = XAxiVdma_GetChannel(InstancePtr, Direction);
 
-    if (!Channel) {
+    if (!Channel)
+    {
         return;
     }
 
-    if (Channel->IsValid) {
+    if (Channel->IsValid)
+    {
         XAxiVdma_ChannelStop(Channel);
     }
 
     return;
 }
-/*****************************************************************************/
-/**
- * Dump registers of one DMA channel
- *
- * @param InstancePtr is the pointer to the DMA engine to work on
- * @param Direction is the DMA channel to work on
- *
- * @return
- *  None
- *
- * @note
- * If channel is invalid, then do nothing on that channel
- *****************************************************************************/
+//--------------------------------------------------------------------------------------------------------------
 void XAxiVdma_DmaRegisterDump(XAxiVdma *InstancePtr, u16 Direction)
 {
     XAxiVdma_Channel *Channel;
@@ -2069,7 +1444,7 @@ void XAxiVdma_DmaRegisterDump(XAxiVdma *InstancePtr, u16 Direction)
 
     return;
 }
-
+//--------------------------------------------------------------------------------------------------------------
 void VDMA_Config_Dump(XAxiVdma_Config *ptr)
 {
 	xil_printf("---------------------------------------------\r\n");
@@ -2105,7 +1480,7 @@ void VDMA_Config_Dump(XAxiVdma_Config *ptr)
 	xil_printf("AddrWidth = %d\r\n", ptr->AddrWidth);
 	xil_printf("---------------------------------------------\r\n");
 }
-//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
 void VDMA_Setup_Dump(XAxiVdma_DmaSetup *ptr)
 {
 	int i;
@@ -2128,72 +1503,29 @@ void VDMA_Setup_Dump(XAxiVdma_DmaSetup *ptr)
 	}
 	xil_printf("---------------------------------------------\r\n");
 }
-//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
 void VDMA_Check_Errors(u32 addr)
 {
-//	u32 *ptr;
-
-//	u32 outErrors;
-/*
-	ptr = (volatile u32 *)(addr + XAXIVDMA_TX_OFFSET + XAXIVDMA_SR_OFFSET);
-
-	outErrors = *ptr & 0x000046F0;
-
-	xil_printf("========== %x =============\r\n", addr);
-	if ( outErrors & 0x00004000 )
-	{
-		xil_printf( "\tMM2S_DMASR - ErrIrq\n\r" );
-	}
-	if ( outErrors & 0x00000400 )
-	{
-		xil_printf( "\tMM2S_DMASR - SGDecErr\n\r" );
-	}
-	if ( outErrors & 0x00000200 )
-	{
-		xil_printf( "\tMM2S_DMASR - SGSlvErr\n\r" );
-	}
-	if ( outErrors & 0x00000080 )
-	{
-		xil_printf( "\tMM2S_DMASR - SOFEarlyErr\n\r" );
-	}
-	if ( outErrors & 0x00000040 )
-	{
-		xil_printf( "\tMM2S_DMASR - DMADecErr\n\r" );
-	}
-	if ( outErrors & 0x00000020 )
-	{
-		xil_printf( "\tMM2S_DMASR - DMASlvErr\n\r" );
-	}
-	if ( outErrors & 0x00000010 )
-	{
-		xil_printf( "\tMM2S_DMASR - DMAIntErr\n\r" );
-	}
-	if (( outErrors & 0x00000000 ) == 0)
-		xil_printf("No Error\r\n");
-	else
-		xil_printf("Error\r\n");
-	xil_printf("=======================\r\n");
-*/
 
 }
-//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
 void VDMA_Control_Dump(u32 addr)
 {
-//	u32 *ptr;
-//	u32 i;
-/*
-	ptr = (u32 *)(addr);
+	u32 *ptr;
+	u32 i;
+//
 
 	xil_printf("---------------------------------------------\r\n");
 	for(i = 0; i < 0xFF; i += 4)
 	{
-		xil_printf("%x Address = %x\r\n", addr + i, *ptr);
+		xil_printf("%x Address = %x\r\n", addr+i, XAxiVdma_ReadReg(addr, i));
 		ptr++;
 	}
 	xil_printf("---------------------------------------------\r\n");
-*/
 }
-//--------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------------------------
+/*
 int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
 {
     int status;
@@ -2223,19 +1555,15 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
     u32 stride = hsize * (Config->Mm2SStreamWidth>>3);
 //  printf("hsize: %d  Width: %d\n", hsize, Config->Mm2SStreamWidth);
 
-    /* ************************************************** */
-    /*           Setup the read channel                   */
-    /*                                                    */
-    /* ************************************************** */
     ReadCfg1.VertSizeInput       = vsize;
     ReadCfg1.HoriSizeInput       = stride;
     ReadCfg1.Stride              = stride;
-    ReadCfg1.FrameDelay          = 0;      /* This example does not test frame delay */
-    ReadCfg1.EnableCircularBuf   = 1;      /* Only 1 buffer, continuous loop */
-    ReadCfg1.EnableSync          = 0;      /* Gen-Lock */
+    ReadCfg1.FrameDelay          = 0;      // This example does not test frame delay
+    ReadCfg1.EnableCircularBuf   = 1;      // Only 1 buffer, continuous loop
+    ReadCfg1.EnableSync          = 0;      // Gen-Lock
     ReadCfg1.PointNum            = 0;
-    ReadCfg1.EnableFrameCounter  = 0;      /* Endless transfers */
-    ReadCfg1.FixedFrameStoreAddr = 0;      /* We are not doing parking */
+    ReadCfg1.EnableFrameCounter  = 0;      // Endless transfers
+    ReadCfg1.FixedFrameStoreAddr = 0;      // We are not doing parking
 
     status = XAxiVdma_DmaConfig(&InstancePtr1, XAXIVDMA_READ, &ReadCfg1);
     if (status != XST_SUCCESS) {
@@ -2248,34 +1576,29 @@ int activate_vdma_1(int base, int hsize, int vsize, uint32_t *vdma1_base)
 	// ReadCfg1.FrameStoreStartAddr[0] = Addr;
 
 
-    /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
+    // Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer
     status = XAxiVdma_DmaSetBufferAddr(&InstancePtr1, XAXIVDMA_READ, (UINTPTR *)vdma1_base);
 	// status = XAxiVdma_DmaSetBufferAddr(&InstancePtr1, XAXIVDMA_READ, ReadCfg1.FrameStoreStartAddr);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
         return status;
     }
-    /************* Read channel setup done ************** */
 
-    /* ************************************************** */
-    /*  Start the DMA engine (read channel) to transfer   */
-    /*                                                    */
-    /* ************************************************** */
 
-    /* Start the Read channel of DMA Engine */
+    // Start the Read channel of DMA Engine
     DBG("Start VDMA1 \n");
     status = XAxiVdma_DmaStart(&InstancePtr1, XAXIVDMA_READ);
     if (status != XST_SUCCESS) {
         xil_printf("Failed to start DMA engine (read channel), status: 0x%X\r\n", status);
         return status;
     }
-    /* ************ DMA engine start done *************** */
+    // ************ DMA engine start done ***************
 	VDMA_Config_Dump(Config);
 	VDMA_Setup_Dump(&ReadCfg1);
 	xil_printf("VDMA1 Engine Start done\n");
     return XST_SUCCESS;
 }
-//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
 int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
 {
     int status;
@@ -2298,19 +1621,15 @@ int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
     }
 	u32 stride = hsize * (Config->Mm2SStreamWidth>>3);
 
-    /* ************************************************** */
-    /*           Setup the read channel                   */
-    /*                                                    */
-    /* ************************************************** */
     ReadCfg3.VertSizeInput       = vsize;
     ReadCfg3.HoriSizeInput       = stride;
     ReadCfg3.Stride              = stride;
-    ReadCfg3.FrameDelay          = 0;      /* This example does not test frame delay */
-    ReadCfg3.EnableCircularBuf   = 1;      /* Only 1 buffer, continuous loop */
-    ReadCfg3.EnableSync          = 0;      /* Gen-Lock */
+    ReadCfg3.FrameDelay          = 0;      // This example does not test frame delay
+    ReadCfg3.EnableCircularBuf   = 1;      // Only 1 buffer, continuous loop
+    ReadCfg3.EnableSync          = 0;      // Gen-Lock
     ReadCfg3.PointNum            = 0;
-    ReadCfg3.EnableFrameCounter  = 0;      /* Endless transfers */
-    ReadCfg3.FixedFrameStoreAddr = 0;      /* We are not doing parking */
+    ReadCfg3.EnableFrameCounter  = 0;      // Endless transfers
+    ReadCfg3.FixedFrameStoreAddr = 0;      // We are not doing parking
 
     status = XAxiVdma_DmaConfig(&InstancePtr3, XAXIVDMA_READ, &ReadCfg3);
     if (status != XST_SUCCESS) {
@@ -2318,76 +1637,62 @@ int activate_vdma_3(int base, int hsize, int vsize, uint32_t *fb_mem)
         return status;
     }
 
-    /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
+    // Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer
     status = XAxiVdma_DmaSetBufferAddr(&InstancePtr3, XAXIVDMA_READ, (UINTPTR *)fb_mem);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
         return status;
     }
 
-    /************* Read channel setup done ************** */
-
-    /* ************************************************** */
-    /*  Start the DMA engine (read channel) to transfer   */
-    /*                                                    */
-    /* ************************************************** */
-
-    /* Start the Read channel of DMA Engine */
+    // Start the Read channel of DMA Engine
     DBG("Start VDMA3\n");
     status = XAxiVdma_DmaStart(&InstancePtr3, XAXIVDMA_READ);
     if (status != XST_SUCCESS) {
         xil_printf("Failed to start DMA engine (read channel), status: 0x%X\r\n", status);
         return status;
     }
-    /* ************ DMA engine start done *************** */
+    // ************ DMA engine start done ***************
 	xil_printf("VDMA3 Engine Start done\n");
 	VDMA_Config_Dump(Config);
 	VDMA_Setup_Dump(&ReadCfg3);
     return XST_SUCCESS;
 }
 
-
+*/
 int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mode)
 {
     int status;
     XAxiVdma_Config *Config;
-	u32 Addr;
-	u32 storage_offset;
 
 	xil_printf("VDMA4 Init Start\n");
-    Config = XAxiVdma_LookupConfig(4);
+    Config = XAxiVdma_LookupConfig(1);
     if (!Config) {
         xil_printf("No video DMA4 found\r\n");
         return XST_FAILURE;
     }else
 	{
-		xil_printf("VDMA4 Config ok\n");
+		xil_printf("VDMA4 Config ok %x\n", Config->BaseAddress);
 	}
 
     status = XAxiVdma_CfgInitialize(&InstancePtr4, Config, Config->BaseAddress);
     if (status != XST_SUCCESS) {
         xil_printf("Configuration Initialization failed, status: 0x%X\r\n", status);
         return status;
-    }else 
+    }else
 	{
 		xil_printf("Configuration Initialization ok\n");
 	}
     u32 stride = hsize * (Config->Mm2SStreamWidth>>3);
 
-
-    /* ************************************************** */
-    /*           Setup the read channel                   */
-    /*                                                    */
-    /* ************************************************** */
     ReadCfg4.VertSizeInput       = vsize;
     ReadCfg4.HoriSizeInput       = stride;
     ReadCfg4.Stride              = stride;
-    ReadCfg4.FrameDelay          = 0;      /* This example does not test frame delay */
-    ReadCfg4.EnableCircularBuf   = 1;      /* Only 1 buffer, continuous loop */
-    ReadCfg4.EnableSync          = 0;      /* Gen-Lock */
+    ReadCfg4.FrameDelay          = 0;      // This example does not test frame delay
+    ReadCfg4.EnableCircularBuf   = 1;      // Only 1 buffer, continuous loop
+    ReadCfg4.EnableSync          = 0;      // Gen-Lock
     ReadCfg4.PointNum            = 0;
-    ReadCfg4.EnableFrameCounter  = 0;      /* Endless transfers */
-    ReadCfg4.FixedFrameStoreAddr = 0;      /* We are not doing parking */
+    ReadCfg4.EnableFrameCounter  = 0;      // Endless transfers
+    ReadCfg4.FixedFrameStoreAddr = 0;      // We are not doing parking
 
     status = XAxiVdma_DmaConfig(&InstancePtr4, XAXIVDMA_WRITE, &ReadCfg4);
     if (status != XST_SUCCESS) {
@@ -2398,40 +1703,560 @@ int activate_vdma_4(int base, int hsize, int vsize, uint32_t *vdma4_base, int Mo
 		xil_printf("Read channel config\n");
 	}
 
-	// storage_offset = ReadCfg4.Stride;
-	// if(Mode == 0)			// FULL HD
-	// 	Addr = VDMA4_BASE_MEM; // + storage_offset + ((1920 * 180 * 4) + (320 *4));
-	// else 					// HD
-	// 	Addr = VDMA4_BASE_MEM + storage_offset + ((1920 * 180 * 4) + (320 *4));
-	// ReadCfg4.FrameStoreStartAddr[0] = Addr;
-
-
-    /* Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer */
+    // Set the buffer addresses for transfer in the DMA engine. This is address first pixel of the framebuffer
     status = XAxiVdma_DmaSetBufferAddr(&InstancePtr4, XAXIVDMA_WRITE, (UINTPTR *)vdma4_base);
 	// status = XAxiVdma_DmaSetBufferAddr(&InstancePtr4, XAXIVDMA_WRITE, ReadCfg4.FrameStoreStartAddr);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed, status: 0x%X\r\n", status);
         return status;
     }
-	
-    /************* Read channel setup done ************** */
 
-    /* ************************************************** */
-    /*  Start the DMA engine (read channel) to transfer   */
-    /*                                                    */
-    /* ************************************************** */
-
-    /* Start the Read channel of DMA Engine */
+    // Start the Read channel of DMA Engine
     DBG("Start VDMA4\n");
     status = XAxiVdma_DmaStart(&InstancePtr4, XAXIVDMA_WRITE);
     if (status != XST_SUCCESS) {
         xil_printf("Failed to start DMA engine (read channel), status: 0x%X\r\n", status);
         return status;
     }
-    /* ************ DMA engine start done *************** */
+    // ************ DMA engine start done ***************
 
 	VDMA_Config_Dump(Config);
 	VDMA_Setup_Dump(&ReadCfg4);
 	xil_printf("VDMA4 Engine Start done  ... \n");
     return XST_SUCCESS;
+}
+
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+int Vdma_WrSetup(XAxiVdma *wInsPtr, XAxiVdma_DmaSetup *wSetupCfg, u16 Id, int hSize, int vSize, int hOffset, int vOffset, u32 wfb_mem)
+{
+	int status;
+	u32 stride;
+	XAxiVdma_Config *wConfig;
+	u32 Addr;
+	u32 storage_offset;
+
+	xil_printf("[VDMA] : DMA%d Init-----------------------\r\n", Id);
+
+	wConfig = XAxiVdma_LookupConfig(Id);
+	if (!wConfig)
+	{
+		xil_printf("[VDMA] : Video DMA%d not found\r\n", Id);
+		return XST_FAILURE;
+	}else
+		xil_printf("[VDMA] : Video DMA%d found\r\n", Id);
+
+	status = XAxiVdma_CfgInitialize(wInsPtr, wConfig, wConfig->BaseAddress);
+	if (status != XST_SUCCESS) {
+		xil_printf("[VDMA] : Configuration Initialization failed, status: 0x%X\r\n", status);
+		return status;
+	}else
+	{
+		xil_printf("[VDMA] : Configuration initialization = %x\r\n", wConfig->BaseAddress);
+	}
+
+	wSetupCfg->VertSizeInput       = vSize;
+	if(Id == VDMA6_FRAME_DEVICE_ID)
+		wSetupCfg->HoriSizeInput   = hSize * 2;
+	else
+		wSetupCfg->HoriSizeInput   = hSize * 2;
+
+	if(Id == VDMA6_FRAME_DEVICE_ID)
+		wSetupCfg->Stride              = 1920 * 2;
+	else
+		wSetupCfg->Stride              = 1920 * 2;
+	// wSetupCfg->Stride              = stride;
+
+	wSetupCfg->FrameDelay          = 0;      /* This example does not test frame delay */
+	wSetupCfg->EnableCircularBuf   = 1;      /* Only 1 buffer, continuous loop */
+	wSetupCfg->EnableSync          = 0;      /* Gen-Lock */
+	wSetupCfg->PointNum            = 0;
+	wSetupCfg->EnableFrameCounter  = 0;      /* Endless transfers */
+	wSetupCfg->FixedFrameStoreAddr = 0;      /* We are not doing parking */
+
+	status = XAxiVdma_DmaConfig(wInsPtr, XAXIVDMA_WRITE, wSetupCfg);
+	if (status != XST_SUCCESS) {
+		xil_printf("[VDMA] : Write channel config failed, status: 0x%X\r\n", status);
+		return status;
+	}else
+	{
+		xil_printf("[VDMA] : Write Channel Config OK\r\n");
+	}
+	/*
+	storage_offset = ReadCfg4.Stride;
+	if(Mode == 0)			// FULL HD
+		Addr = wfb_mem; // + storage_offset + ((1920 * 180 * 4) + (320 *4));
+	else 					// HD
+		Addr = wfb_mem; //  + storage_offset + ((1920 * gDb.yImageStart * 2) + (gDb.xImageStart *2));
+*/
+
+	if(Id == VDMA5_FRAME_DEVICE_ID)
+	{
+		Addr = wfb_mem +  ((2048 * vOffset) + (hOffset *2));
+		wSetupCfg->FrameStoreStartAddr[0] = Addr;
+	}else
+	{
+		Addr = wfb_mem;
+		wSetupCfg->FrameStoreStartAddr[0] = Addr;
+	}
+
+	status = XAxiVdma_DmaSetBufferAddr(wInsPtr, XAXIVDMA_WRITE, wSetupCfg->FrameStoreStartAddr);
+	if (status != XST_SUCCESS) {
+		xil_printf("[VDMA] : Write channel set buffer address failed, status: 0x%X\r\n", status);
+		return status;
+	}else
+		xil_printf("[VDMA] : Write Channel Set Buffer Address\r\n");
+
+	status = XAxiVdma_DmaStart(wInsPtr, XAXIVDMA_WRITE);
+	if (status != XST_SUCCESS) {
+		xil_printf("[VDMA] : Failed to start DMA engine (Write channel), status: 0x%X\r\n", status);
+		return status;
+	}else
+		xil_printf("[VDMA] : Start DMA Engine(Write channel)\r\n");
+
+	// VDMA_Config_Dump(wConfig);
+	// VDMA_Setup_Dump(wSetupCfg);
+	VDMA_Control_Dump(wConfig->BaseAddress);
+
+	return XST_SUCCESS;
+}
+//--------------------------------------------------------------------------------------------------------------
+int Vdma_wSetup(XAxiVdma *wInsPtr, XAxiVdma_DmaSetup *wSetupCfg, int Id, int hsize, int vsize, int hOffset, int vOffset, uint32_t *wvdma_base)
+{
+ 	int status;
+    XAxiVdma_Config *wConfig;
+	u32 Addr;
+
+	xil_printf("\r\n-----------------------------------------------------------------\r\n");
+	xil_printf("[VDMA-W OK] : VDMA%d Init Start\n", Id);
+    wConfig = XAxiVdma_LookupConfig(Id);
+    if (!wConfig) {
+        xil_printf("[VDMA-W NO] : No video DMA%d found\r\n", Id);
+        return XST_FAILURE;
+    }else
+	{
+		xil_printf("[VDMA-W OK] : VDMA%d Config ok\n", Id);
+	}
+	vdma_orgBase = wConfig->BaseAddress;
+	Vdma_Open(wConfig->BaseAddress);
+
+    status = XAxiVdma_CfgInitialize(wInsPtr, wConfig, wConfig->BaseAddress);
+    if (status != XST_SUCCESS)
+	{
+        xil_printf("[VDMA-W NO] : Configuration Initialization failed, status: 0x%X\r\n", status);
+        return status;
+    }else
+	{
+		xil_printf("[VDMA-W OK] : Configuration Initialization ok\n");
+	}
+
+    wSetupCfg->VertSizeInput       = vsize;
+    wSetupCfg->HoriSizeInput       = hsize * 2;
+    wSetupCfg->Stride              = 1920 * 2;
+    wSetupCfg->FrameDelay          = 0;      // This example does not test frame delay
+    wSetupCfg->EnableCircularBuf   = 1;      // Only 1 buffer, continuous loop
+    wSetupCfg->EnableSync          = 0;      // Gen-Lock
+    wSetupCfg->PointNum            = 0;
+    wSetupCfg->EnableFrameCounter  = 0;      // Endless transfers
+    wSetupCfg->FixedFrameStoreAddr = 0;      // We are not doing parking
+
+    status = XAxiVdma_DmaConfig(wInsPtr, XAXIVDMA_WRITE, wSetupCfg);
+    if (status != XST_SUCCESS)
+	{
+        xil_printf("[VDMA-W NO] : Read channel config failed, status: 0x%X\r\n", status);
+        // return status;
+    }else
+	{
+		xil_printf("[VDMA-W OK] : Read channel config\n");
+	}
+
+	if(Id == VDMA5_FRAME_DEVICE_ID)
+	{
+		Addr = wfb5_mem + ((1920 * vOffset * 2) + (hOffset * 2));
+		wSetupCfg->FrameStoreStartAddr[0] = Addr;
+
+		status = XAxiVdma_DmaSetBufferAddr(wInsPtr, XAXIVDMA_WRITE, wSetupCfg->FrameStoreStartAddr);
+	}else
+	{
+    	status = XAxiVdma_DmaSetBufferAddr(wInsPtr, XAXIVDMA_WRITE, (UINTPTR *)wvdma_base);
+	}
+
+    if (status != XST_SUCCESS)
+	{
+        xil_printf("[VDMA-W NO] : Read channel set buffer address failed, status: 0x%X\r\n", status);
+        // return status;
+    }
+
+    status = XAxiVdma_DmaStart(wInsPtr, XAXIVDMA_WRITE);
+    if (status != XST_SUCCESS) {
+        xil_printf("[VDMA-W NO] : Failed to start DMA engine (read channel), status: 0x%X\r\n", status);
+        // return status;
+    }
+
+	// VDMA_Config_Dump(wConfig);
+	// VDMA_Setup_Dump(wSetupCfg);
+	// VDMA_Control_Dump(wConfig->BaseAddress);
+	Vdma_Close();
+	xil_printf("=================================================================\r\n");
+    return XST_SUCCESS;
+}
+//--------------------------------------------------------------------------------------------------------------
+int Vdma_rSetup(XAxiVdma *InsPtr, XAxiVdma_DmaSetup *SetupCfg, int Id, int hsize, int vsize, uint32_t *rvdma_base)
+{
+    int status;
+    XAxiVdma_Config *rConfig;
+
+	xil_printf("\r\n-----------------------------------------------------------------\r\n");
+	xil_printf("[VDMA OK] : VDMA%d Init Start\r\n", Id);
+
+    rConfig = XAxiVdma_LookupConfig(Id);
+    if (!rConfig)
+	{
+        xil_printf("[VDMA NO] : No video DMA%d found\r\n", Id);
+        return XST_FAILURE;
+    }else
+	{
+		xil_printf("[VDMA OK] : Video DMA%d config address = %x\n", Id, rConfig->BaseAddress);
+	}
+
+	vdma_orgBase = rConfig->BaseAddress;
+	Vdma_Open(rConfig->BaseAddress);
+
+    status = XAxiVdma_CfgInitialize(InsPtr, rConfig, rConfig->BaseAddress);
+    if (status != XST_SUCCESS)
+	{
+        xil_printf("[VDMA NO] : Configuration Initialization failed, status: 0x%X\r\n", status);
+        return status;
+    }else
+	{
+		xil_printf("[VDMA OK] : Configuration Initialization OK\n");
+	}
+
+	if(Id == VDMA3_FRAME_DEVICE_ID)
+	{
+    	SetupCfg->VertSizeInput       = vsize;
+    	SetupCfg->HoriSizeInput       = hsize * 4;
+    	SetupCfg->Stride              = 1920 * 4;
+	}else
+	{
+		SetupCfg->VertSizeInput       = vsize;
+    	SetupCfg->HoriSizeInput       = hsize * 2;
+    	SetupCfg->Stride              = 1920 * 2;
+	}
+    SetupCfg->FrameDelay          = 0;      // This example does not test frame delay */
+    SetupCfg->EnableCircularBuf   = 1;      // Only 1 buffer, continuous loop */
+    SetupCfg->EnableSync          = 1;      // Gen-Lock */
+    SetupCfg->PointNum            = 0;
+    SetupCfg->EnableFrameCounter  = 0;      // Endless transfers */
+    SetupCfg->FixedFrameStoreAddr = 0;      // We are not doing parking */
+
+
+    status = XAxiVdma_DmaConfig(InsPtr, XAXIVDMA_READ, SetupCfg);
+    if (status != XST_SUCCESS)
+	{
+        xil_printf("[VDMA NO] : Read channel config failed, status: 0x%X\r\n", status);
+        // return status;
+    }
+
+    status = XAxiVdma_DmaSetBufferAddr(InsPtr, XAXIVDMA_READ, (UINTPTR *)rvdma_base);
+    if (status != XST_SUCCESS)
+	{
+        xil_printf("[VDMA NO] : Read channel set buffer address failed, status: 0x%X\r\n", status);
+		// return status;
+    }
+    status = XAxiVdma_DmaStart(InsPtr, XAXIVDMA_READ);
+
+	if (status != XST_SUCCESS)
+	{
+        xil_printf("[VDMA NO] : Failed to start DMA engine (read channel), status: 0x%X\r\n", status);
+        // return status;
+    }
+
+	// VDMA_Config_Dump(rConfig);
+	// VDMA_Setup_Dump(SetupCfg);
+	// VDMA_Control_Dump(rConfig->BaseAddress);
+	xil_printf("[VDMA OK] : VDMA%d Engine Start done\r\n", Id);
+	xil_printf("=================================================================\r\n");
+	Vdma_Close();
+    return XST_SUCCESS;
+}
+//--------------------------------------------------------------------------------------------------------------
+int Vdma_Stop(int Id)
+{
+	switch(Id)
+	{
+		case VDMA1_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStop(&rInstancePtr1, XAXIVDMA_READ);
+			break;
+
+		case VDMA3_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStop(&rInstancePtr3, XAXIVDMA_READ);
+			break;
+
+		case VDMA9_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStop(&rInstancePtr9, XAXIVDMA_READ);
+			break;
+
+		case VDMA7_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStop(&rInstancePtr7, XAXIVDMA_READ);
+			break;
+
+		case VDMA8_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStop(&rInstancePtr8, XAXIVDMA_READ);
+			break;
+
+		case VDMA4_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStop(&wInstancePtr4, XAXIVDMA_WRITE);
+			break;
+
+		case VDMA5_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStop(&wInstancePtr5, XAXIVDMA_WRITE);
+			break;
+
+		case VDMA6_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStop(&wInstancePtr6, XAXIVDMA_WRITE);
+			break;
+
+		case 99:
+			break;
+
+		default:
+			break;
+	}
+
+	return XST_SUCCESS;
+}
+//--------------------------------------------------------------------------------------------------------------
+int Vdma_Start(int Id)
+{
+	switch(Id)
+	{
+		case VDMA1_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStart(&rInstancePtr1, XAXIVDMA_READ);
+			break;
+
+		case VDMA3_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStart(&rInstancePtr3, XAXIVDMA_READ);
+			break;
+
+		case VDMA9_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStart(&rInstancePtr9, XAXIVDMA_READ);
+			break;
+
+		case VDMA7_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStart(&rInstancePtr7, XAXIVDMA_READ);
+			break;
+
+		case VDMA8_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStart(&rInstancePtr8, XAXIVDMA_READ);
+			break;
+
+		case VDMA4_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStart(&wInstancePtr4, XAXIVDMA_WRITE);
+			break;
+
+		case VDMA5_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStart(&wInstancePtr5, XAXIVDMA_WRITE);
+			break;
+
+		case VDMA6_FRAME_DEVICE_ID:
+			XAxiVdma_DmaStart(&wInstancePtr6, XAXIVDMA_WRITE);
+			break;
+
+		case 99:
+			break;
+
+		default:
+			break;
+	}
+
+	return XST_SUCCESS;
+}
+//--------------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------------------------
+int Vdma_SetActive(int Id, int hsize, int vsize, int hoffset, int voffset, uint32_t *vdma_base)
+{
+	int status;
+
+	rfb1_mem = RVDMA1_BASE_MEM;
+	wfb4_mem = WVDMA4_BASE_MEM;
+	wfb5_mem = WVDMA5_BASE_MEM;
+	wfb6_mem = WVDMA6_BASE_MEM;
+	rfb7_mem = RVDMA7_BASE_MEM;
+	rfb8_mem = RVDMA8_BASE_MEM;
+	rfb9_mem = RVDMA9_BASE_MEM;
+
+	switch(Id)
+	{
+		case VDMA1_FRAME_DEVICE_ID:
+			status = Vdma_rSetup(&rInstancePtr1, &rReadCfg1, VDMA1_FRAME_DEVICE_ID, hsize, vsize, &rfb1_mem);
+			break;
+
+		case VDMA3_FRAME_DEVICE_ID:
+			status = Vdma_rSetup(&rInstancePtr3, &rReadCfg3, VDMA3_FRAME_DEVICE_ID, hsize, vsize, vdma_base);
+			break;
+
+		case VDMA9_FRAME_DEVICE_ID:
+			status = Vdma_rSetup(&rInstancePtr9, &rReadCfg3, VDMA9_FRAME_DEVICE_ID, hsize, vsize, &rfb9_mem);
+			break;
+
+		case VDMA7_FRAME_DEVICE_ID:
+			status = Vdma_rSetup(&rInstancePtr7, &rReadCfg7, VDMA7_FRAME_DEVICE_ID, hsize, vsize, &rfb7_mem);
+			break;
+
+		case VDMA8_FRAME_DEVICE_ID:
+			status = Vdma_rSetup(&rInstancePtr8, &rReadCfg8, VDMA8_FRAME_DEVICE_ID, hsize, vsize, &rfb8_mem);
+			break;
+
+		case VDMA4_FRAME_DEVICE_ID:
+			status = Vdma_wSetup(&wInstancePtr4, &wReadCfg4, VDMA4_FRAME_DEVICE_ID, hsize, vsize, 0, 0, &wfb4_mem);
+			break;
+
+		case VDMA5_FRAME_DEVICE_ID:
+			status = Vdma_wSetup(&wInstancePtr5, &wReadCfg5, VDMA5_FRAME_DEVICE_ID, hsize, vsize, hoffset, voffset, &wfb5_mem);
+			break;
+
+		case VDMA6_FRAME_DEVICE_ID:
+			status = Vdma_wSetup(&wInstancePtr6, &wReadCfg6, VDMA6_FRAME_DEVICE_ID, hsize, vsize, 0, 0, &wfb6_mem);
+			break;
+
+		default:
+			status = 0;
+			break;
+	}
+	return status;
+}
+//--------------------------------------------------------------------------------------------------------------
+int Vtc_Change(uint32_t vtcConfig, int Mode)
+{
+	Vtc_Open(vtcConfig);
+	if(Mode == 1)		// FULL HD
+	{
+		XVtc_WriteReg(vtcConfig, (0x60), 0x43803C0);
+		//XVtc_WriteReg(vtcConfig, (0x64), 0x04);
+		XVtc_WriteReg(vtcConfig, (0x68), 0x02);
+		XVtc_WriteReg(vtcConfig, (0x6C), 0x7F);
+		XVtc_WriteReg(vtcConfig, (0x70), 0x44C);
+		XVtc_WriteReg(vtcConfig, (0x74), 0x4650465);
+		XVtc_WriteReg(vtcConfig, (0x78), 0x40203EC);
+		XVtc_WriteReg(vtcConfig, (0x7C), 0x3C003C0);
+		XVtc_WriteReg(vtcConfig, (0x80), 0x440043B);
+		XVtc_WriteReg(vtcConfig, (0x84), 0x3C003C0);
+		XVtc_WriteReg(vtcConfig, (0x88), 0x7800780);
+		XVtc_WriteReg(vtcConfig, (0x8C), 0x440043B);
+		XVtc_WriteReg(vtcConfig, (0x90), 0x7800780);
+
+	}else				// 5:4
+	{
+		XVtc_WriteReg(vtcConfig, (0x60), 0x4000280);
+		// XVtc_WriteReg(vtcConfig, (0x64), 0x00);
+		XVtc_WriteReg(vtcConfig, (0x68), 0x02);
+		XVtc_WriteReg(vtcConfig, (0x6C), 0x7F);
+		XVtc_WriteReg(vtcConfig, (0x70), 0x48A);
+		XVtc_WriteReg(vtcConfig, (0x74), 0x4670429);
+		XVtc_WriteReg(vtcConfig, (0x78), 0x40203Ec);
+		XVtc_WriteReg(vtcConfig, (0x7C), 0x2800280);
+		XVtc_WriteReg(vtcConfig, (0x80), 0x41E041A);
+		XVtc_WriteReg(vtcConfig, (0x84), 0x2800280);
+		XVtc_WriteReg(vtcConfig, (0x88), 0x7800780);
+		XVtc_WriteReg(vtcConfig, (0x8C), 0x440043B);
+		XVtc_WriteReg(vtcConfig, (0x90), 0x7800780);
+	}
+	Vtc_Close();
+
+	return 1;
+}
+//--------------------------------------------------------------------------------------------------------------
+int Vtc_Enable(int Id, int Mode)
+{
+	switch(Id)
+	{
+		case XVTC1_DEVICE_ID:
+			Vtc_Open(0x83C10000);
+			if(Mode == 1)
+				XVtc_WriteReg(0, (0x00), 0x7F7EF07);
+			else
+				XVtc_WriteReg(0, (0x00), 0x0);
+			Vtc_Close();
+			break;
+
+		case XVTC2_DEVICE_ID:
+			Vtc_Open(0x83C20000);
+			if(Mode == 1)
+				XVtc_WriteReg(0, (0x00), 0x7F7EF07);
+			else
+				XVtc_WriteReg(0, (0x00), 0x0);
+			Vtc_Close();
+			break;
+
+		case XVTC5_DEVICE_ID:
+			Vtc_Open(0x83C40000);
+			if(Mode == 1)
+				XVtc_WriteReg(0, (0x00), 0x7F7EF07);
+			else
+				XVtc_WriteReg(0, (0x00), 0x0);
+			Vtc_Close();
+			break;
+
+		case XVTC4_DEVICE_ID:
+			Vtc_Open(0x83C30000);
+			if(Mode == 1)
+				XVtc_WriteReg(0, (0x00), 0x7F7EF07);
+			else
+				XVtc_WriteReg(0, (0x00), 0x0);
+			Vtc_Close();
+			break;
+
+		default:
+
+			break;
+	}
+	return 1;
+}
+//--------------------------------------------------------------------------------------------------------------
+int Vtc_Init(int Id, int Mode)
+{
+	vtc1_mem = 0x83C10000;
+	vtc2_mem = 0x83C20000;
+	vtc5_mem = 0x83C40000;
+	vtc4_mem = 0x83C30000;
+
+	switch(Id)
+	{
+		case XVTC1_DEVICE_ID:
+			Vtc_Change(vtc1_mem, Mode);
+			break;
+
+		case XVTC2_DEVICE_ID:
+			break;
+
+		case XVTC5_DEVICE_ID:
+			Vtc_Change(vtc5_mem, Mode);
+			break;
+
+		case XVTC4_DEVICE_ID:
+
+			break;
+
+		default:
+
+			break;
+	}
+	return 1;
+}
+//--------------------------------------------------------------------------------------------------------------
+int Vdma_Init(uint32_t *menu_addr)
+{
+	Vdma_SetActive(VDMA1_FRAME_DEVICE_ID, 1920, 1080, 0, 0, 0);
+	Vdma_SetActive(VDMA3_FRAME_DEVICE_ID, 1920, 1080, 0, 0, menu_addr);
+	Vdma_SetActive(VDMA9_FRAME_DEVICE_ID, 1920, 1080, 0, 0, 0);
+	Vdma_SetActive(VDMA7_FRAME_DEVICE_ID, 1920, 1080, 0, 0, 0);
+	Vdma_SetActive(VDMA8_FRAME_DEVICE_ID, 720,   480, 0, 0, 0);
+
+	Vdma_SetActive(VDMA4_FRAME_DEVICE_ID, 1920, 1080, 0, 0, 0);
+	Vdma_SetActive(VDMA5_FRAME_DEVICE_ID, 1536,  864, 0, 0, 0);
+	Vdma_SetActive(VDMA6_FRAME_DEVICE_ID, 720,   480, 0, 0, 0);
+	return 1;
 }

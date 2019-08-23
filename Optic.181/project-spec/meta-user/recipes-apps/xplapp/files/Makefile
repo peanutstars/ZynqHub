@@ -1,7 +1,7 @@
 APP = xplinit fbtest
 
 # Add any other object files to this list below
-XPL_OBJS = xplapp.o xplioctl.o vdma.o
+XPL_OBJS = xplapp.o xplioctl.o vdma.o scaler.o
 FB_OBJS = fbtest.o
 
 CFLAGS  := -Wall -g

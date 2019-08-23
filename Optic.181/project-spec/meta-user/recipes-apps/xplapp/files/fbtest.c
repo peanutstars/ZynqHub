@@ -181,18 +181,42 @@ int main( int argc, char* argv[] )
         int y_limit = height;
         for ( y=0; y<y_limit; y++)  
 		{
+            if ((y%100) != 0)
+                continue;
+
             for ( x=0; x<width; x++)  
             {  
                 // unsigned int pixel_offset = (y+yoffset)*framebuffer_fixed_screeninfo.line_length*2 +(x+xoffset)*bpp; 
 				unsigned int pixel_offset = ((width * bpp) * (y + yoffset)) + ((x + xoffset) * bpp);
 				if(bpp == 4)
 				{		
-					if(x < width / 2)
+					if(x < width)
 					{		
 						framebuffer_pointer[pixel_offset]	= 0;//B  
                 		framebuffer_pointer[pixel_offset+1]	= 0;//G  
-                		framebuffer_pointer[pixel_offset+2]	= 0;//R  
-                		framebuffer_pointer[pixel_offset+3]	= 255;//A
+                		framebuffer_pointer[pixel_offset+2]	= 0xFF;//R  
+                		framebuffer_pointer[pixel_offset+3]	= 128;//A
+					}else
+					{
+						
+					}
+				}  
+            }
+		}  
+        for ( y=0; y<y_limit; y++)  
+		{
+            for ( x=0; x<width; x++)  
+            {  
+                // unsigned int pixel_offset = (y+yoffset)*framebuffer_fixed_screeninfo.line_length*2 +(x+xoffset)*bpp; 
+				unsigned int pixel_offset = ((width * bpp) * (y + yoffset)) + ((x + xoffset) * bpp);
+				if(bpp == 4)
+				{		
+					if((x%100) == 0)
+					{		
+						framebuffer_pointer[pixel_offset]	= 0;//B  
+                		framebuffer_pointer[pixel_offset+1]	= 0;//G  
+                		framebuffer_pointer[pixel_offset+2]	= 0xFF;//R  
+                		framebuffer_pointer[pixel_offset+3]	= 128;//A
 					}else
 					{
 						

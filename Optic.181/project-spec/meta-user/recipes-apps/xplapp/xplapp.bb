@@ -13,6 +13,7 @@ SRC_URI = "file://xplapp.c \
 	   file://xplioctl.c \
 	   file://xplioctl.h \
 	   file://vdma.c \
+	   file://scaler.c \
 	   file://xilinx/xdebug.h \
 	   file://xilinx/xaxivdma_hw.h \
 	   file://xilinx/xiltypes.h \

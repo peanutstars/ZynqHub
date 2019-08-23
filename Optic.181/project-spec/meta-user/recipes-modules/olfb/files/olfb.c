@@ -35,7 +35,7 @@
 
 #define VFB_OL							1
 #define VFB_OL_PHYSICAL_BASE			0x40000000
-#define VFB_OL_SIZE			            0x800000
+#define VFB_OL_SIZE			         	0x01000000
 #define ENABLE_MEM_REGION				0
 
 static void *videomemory;
@@ -97,17 +97,17 @@ static void rvfree(void *mem, unsigned long size)
 
 static struct fb_var_screeninfo vfb_default = {
 	.xres =		1920,
-	.yres =		1080,
+	.yres =		1600,
 	.xres_virtual =	1920,
-	.yres_virtual =	1080,
+	.yres_virtual =	1600,
 	.bits_per_pixel = 32,
 	.red =		{ 0, 8, 0 },
     .green =	{ 8, 8, 0 },
     .blue =		{ 16, 8, 0 },
 //	.activate =	FB_ACTIVATE_TEST,
 	.activate =	FB_ACTIVATE_NOW,
-    .height =	1920,
-    .width =	1080,
+    .height =	1600,
+    .width =	1920,
 //	.pixclock =	20000,
 //	.left_margin =	64,
 //	.right_margin =	64,
